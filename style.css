@@ -1,46 +1,85 @@
+:root {
+    --blood-red: #8b0000;
+    --dark-crimson: #4a0000;
+    --death-black: #050505;
+    --pure-red: #ff0000;
+}
+
 body {
-    background: #1a1a1a;
-    color: #e0e0e0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--death-black);
+    color: #ccc;
+    font-family: 'Courier New', monospace;
     display: flex;
     justify-content: center;
-    padding: 20px;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    overflow: hidden;
 }
 
-#game-container {
-    max-width: 600px;
+.blood-container { width: 95%; max-width: 400px; }
+
+.murder-title {
+    text-align: center;
+    color: #fff;
+    letter-spacing: 4px;
+    text-shadow: 0 0 10px var(--blood-red);
+}
+
+.murder-title span { color: var(--pure-red); animation: flicker 2s infinite; }
+
+.terminal-card {
+    background: rgba(15, 0, 0, 0.9);
+    border: 1px solid var(--dark-crimson);
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(139, 0, 0, 0.2);
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
+}
+
+.id-display { font-size: 1.8rem; color: var(--pure-red); text-align: center; margin-bottom: 5px; font-weight: bold; }
+
+.btn-main, .btn-action, .btn-send, .btn-bot {
     width: 100%;
-    background: #2d2d2d;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-}
-
-.hidden { display: none; }
-
-button {
-    background: #e74c3c;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin: 5px;
+    background: var(--dark-crimson);
+    border: 1px solid var(--blood-red);
+    color: #fff;
+    padding: 12px;
+    margin: 8px 0;
     cursor: pointer;
-    border-radius: 5px;
+    font-weight: bold;
     transition: 0.3s;
 }
 
-button:hover { background: #c0392b; }
+.btn-main:hover { background: var(--blood-red); box-shadow: 0 0 10px var(--pure-red); }
 
-#chat-area {
-    height: 200px;
-    overflow-y: auto;
-    background: #121212;
+#murder-logs {
+    flex-grow: 1;
+    background: #000;
+    border: 1px solid #1a0000;
+    margin: 15px 0;
     padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
+    overflow-y: auto;
+    font-size: 0.85rem;
+    color: #ff9999;
 }
 
-#scoreboard {
-    margin-top: 20px;
-    border-top: 1px solid #444;
+.role-reveal {
+    border-bottom: 2px solid var(--blood-red);
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+#secret-word { font-size: 1.6rem; color: var(--pure-red); letter-spacing: 2px; }
+
+.xp-bar-bg { background: #1a0000; height: 6px; width: 100%; margin-top: 5px; }
+.xp-bar-fill { background: var(--pure-red); height: 100%; width: 0%; box-shadow: 0 0 8px var(--pure-red); transition: 1s; }
+.xp-label { font-size: 0.7rem; color: var(--blood-red); margin-bottom: 15px; }
+
+.hidden { display: none !important; }
+
+@keyframes flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+    20%, 22%, 24%, 55% { opacity: 0; }
 }
