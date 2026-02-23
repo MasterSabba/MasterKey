@@ -1,62 +1,74 @@
 :root {
-    --gold: #ffcc00;
-    --neon: #00f3ff;
-    --cell: 52px;
+    --bg: #1e140f;
+    --board: #35231a;
+    --wood-light: #b07d4d;
+    --wood-dark: #5d3a1a;
+    --gold: #ffd700;
+    --cell: 50px;
 }
 
 body {
-    margin: 0; height: 100vh; background: #0a0a0a; color: #f0e6d2;
-    font-family: 'Segoe UI', serif; display: flex; justify-content: center; align-items: center;
-    overflow: hidden; transition: background 1s;
+    margin: 0; background: var(--bg); font-family: 'Segoe UI', Roboto, sans-serif;
+    color: #f0e6d2; display: flex; justify-content: center; align-items: center; height: 100vh;
 }
 
-.main-container { display: flex; gap: 30px; align-items: center; z-index: 10; }
-
-/* Board & Blocks */
-.board-wrapper {
-    position: relative; background: #2d1b0d; padding: 10px; border-radius: 12px;
-    box-shadow: 0 0 50px rgba(0,0,0,0.8); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+.game-wrapper {
+    width: 360px; display: flex; flex-direction: column; gap: 20px;
 }
 
-.grid-canvas { width: 312px; height: 312px; position: relative; }
+header { display: flex; justify-content: space-between; align-items: center; }
+.brand { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; }
+.brand span { color: var(--gold); }
 
+.stat-pill {
+    background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 20px;
+    font-size: 0.9rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* LA BOARD: fissa e centrata */
+.board-container {
+    position: relative; background: var(--board); padding: 10px;
+    border-radius: 15px; box-shadow: inset 0 10px 20px rgba(0,0,0,0.5), 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.board {
+    position: relative; width: 300px; height: 300px; /* 6x50px */
+    background: repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(0,0,0,0.2) 50px);
+}
+
+/* PEZZI: Grafica Legnosa Avanzata */
 .block {
-    position: absolute; border-radius: 6px; touch-action: none;
-    display: flex; align-items: center; justify-content: center; font-size: 24px;
-    box-shadow: 0 6px 0 rgba(0,0,0,0.4); transition: transform 0.1s;
+    position: absolute; border-radius: 8px; cursor: grab;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.1s, box-shadow 0.1s;
 }
 
-/* Skins */
-.skin-wood .block-h { background: linear-gradient(#8b5a2b, #5d3a1a); }
-.skin-wood .block-v { background: linear-gradient(to right, #7d4e2d, #4a2c16); }
-.skin-wood .block-key { background: linear-gradient(135deg, var(--gold), #b8860b); border: 2px solid #fff; }
+.block:active { transform: scale(0.98); box-shadow: 0 2px 0 rgba(0,0,0,0.4); }
 
-.skin-marble .block { background: #e0e0e0; border: 1px solid #999; box-shadow: 0 4px 0 #888; }
-.skin-marble .block-key { background: #fff; border: 2px solid gold; }
+/* Skins Specifiche */
+.skin-wood .block-h { background: linear-gradient(#b07d4d, #8b5a2b); border: 1px solid #5d3a1a; }
+.skin-wood .block-v { background: linear-gradient(to right, #96653a, #5d3a1a); border: 1px solid #3d2616; }
+.skin-wood .block-key { background: linear-gradient(135deg, #ffd700, #b8860b); border: 2px solid #fff; z-index: 10; }
 
-.skin-liquid .block { 
-    background: linear-gradient(45deg, #757575, #ffffff, #757575); background-size: 200%;
-    animation: flow 3s infinite linear; border-radius: 15px;
+.skin-marble .block { background: #fdfdfd; border: 1px solid #ccc; box-shadow: 0 4px 0 #bbb; }
+.skin-marble .block-key { background: #333; color: white; border-color: gold; }
+
+/* UI Footer */
+.progress-container { margin-bottom: 15px; }
+.progress-label { font-size: 0.7rem; margin-bottom: 5px; opacity: 0.7; }
+.bar-bg { background: #000; height: 6px; border-radius: 3px; overflow: hidden; }
+.bar-fill { background: var(--gold); height: 100%; width: 0%; transition: width 0.4s; }
+
+.button-grid { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 10px; }
+.btn {
+    border: none; padding: 12px; border-radius: 10px; font-weight: bold;
+    cursor: pointer; background: #4a2c16; color: white; box-shadow: 0 4px 0 #2d1b0d;
 }
-@keyframes flow { 0% {background-position:0%} 100% {background-position:200%} }
+.btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #2d1b0d; }
+.btn-hint { background: var(--gold); color: #000; box-shadow: 0 4px 0 #b8860b; }
 
-/* UI & Modals */
-.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 100; }
-.modal { background: #3d2616; padding: 30px; border-radius: 20px; text-align: center; border: 3px solid var(--gold); max-width: 90%; }
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 100; }
+.modal { background: #2d1b0d; padding: 25px; border-radius: 20px; width: 250px; text-align: center; }
+.skin-opt { display: block; width: 100%; margin: 10px 0; padding: 10px; border-radius: 8px; border: none; cursor: pointer; }
 .hidden { display: none !important; }
-
-.btn-main { 
-    padding: 12px 20px; background: #5d3a1a; border: none; color: white; border-radius: 8px;
-    cursor: pointer; box-shadow: 0 4px 0 #1a0f0a; font-weight: bold; margin: 5px;
-}
-.gold-btn { background: var(--gold); color: #000; }
-
-.xp-track { width: 100%; height: 8px; background: #000; border-radius: 4px; margin: 10px 0; }
-.xp-bar { height: 100%; background: var(--gold); width: 0%; transition: width 0.5s; }
-
-/* Boss Effects */
-.boss-rotating { animation: rotateBoard 10s infinite linear; }
-@keyframes rotateBoard { from {transform: rotate(0deg)} to {transform: rotate(360deg)} }
-
-.theme-void { background: #000; filter: hue-rotate(280deg) contrast(1.2); }
-#qrcode-container { background: white; padding: 10px; margin: 15px auto; display: inline-block; }
