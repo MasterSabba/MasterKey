@@ -1,69 +1,56 @@
 const grid = document.getElementById('grid');
 const cellSize = 52;
-let currentBlocks = [];
-let initialLayout = []; // Per il reset dello stesso livello
+
+// Database di livelli risolvibili (x, y, lunghezza, orientamento, isKey)
+const LEVELS = [
+    // Livello 1: Facile
+    [{x:0, y:2, l:2, o:'h', k:true}, {x:2, y:0, l:3, o:'v', k:false}, {x:3, y:3, l:2, o:'h', k:false}],
+    // Livello 2: Ostacoli verticali
+    [{x:0, y:2, l:2, o:'h', k:true}, {x:2, y:2, l:2, o:'v', k:false}, {x:3, y:1, l:3, o:'v', k:false}, {x:4, y:4, l:2, o:'h', k:false}],
+    // Livello 3: Incastro
+    [{x:0, y:2, l:2, o:'h', k:true}, {x:2, y:0, l:2, o:'v', k:false}, {x:2, y:3, l:3, o:'v', k:false}, {x:3, y:2, l:2, o:'v', k:false}, {x:4, y:0, l:2, o:'h', k:false}],
+    // Livello 4: Sfida
+    [{x:0, y:2, l:2, o:'h', k:true}, {x:2, y:0, l:3, o:'v', k:false}, {x:3, y:0, l:2, o:'h', k:false}, {x:3, y:2, l:2, o:'v', k:false}, {x:4, y:3, l:2, o:'v', k:false}, {x:0, y:4, l:3, o:'h', k:false}]
+];
+
+let currentLevelIdx = parseInt(localStorage.getItem('mk_lvl')) || 0;
+let xp = parseInt(localStorage.getItem('mk_xp')) || 0;
 let moves = 0;
-let xp = parseInt(localStorage.getItem('mkey_xp_v2')) || 0;
-let lvl = parseInt(localStorage.getItem('mkey_lvl_v2')) || 1;
+let blocks = [];
 
-// --- LOGICA GENERAZIONE ---
-function generateLevel() {
+function loadLevel(idx) {
+    const levelData = LEVELS[idx % LEVELS.length];
+    blocks = JSON.parse(JSON.stringify(levelData)); // Copia profonda per Reset
     moves = 0;
-    updateUI();
-    
-    // 1. Chiave obbligatoria
-    let layout = [{ x: 0, y: 2, l: 2, o: 'h', k: true }];
-    
-    // 2. Aggiunta ostacoli con controllo collisioni
-    const maxObstacles = 5 + Math.min(Math.floor(lvl/2), 8);
-    let attempts = 0;
-    
-    while (layout.length < maxObstacles && attempts < 100) {
-        attempts++;
-        let l = Math.random() > 0.7 ? 3 : 2;
-        let o = Math.random() > 0.5 ? 'h' : 'v';
-        let x = Math.floor(Math.random() * (6 - (o === 'h' ? l : 0)));
-        let y = Math.floor(Math.random() * (6 - (o === 'v' ? l : 0)));
-
-        // Non sovrapporre la traiettoria immediata della chiave per i primi livelli
-        if (lvl < 3 && o === 'v' && x > 1 && y <= 2 && y + l > 2) continue;
-
-        if (!layout.some(b => isColliding(x, y, l, o, b))) {
-            layout.push({ x, y, l, o, k: false });
-        }
-    }
-    
-    initialLayout = JSON.parse(JSON.stringify(layout)); // Salva lo stato iniziale
-    currentBlocks = layout;
     render();
+    updateUI();
 }
 
 function render() {
     grid.innerHTML = '';
-    currentBlocks.forEach((b, i) => {
+    blocks.forEach((b, i) => {
         const el = document.createElement('div');
         el.className = `block ${b.k ? 'block-key' : (b.o === 'h' ? 'block-h' : 'block-v')}`;
-        el.style.width = (b.o === 'h' ? b.l * cellSize : cellSize) - 8 + 'px';
-        el.style.height = (b.o === 'v' ? b.l * cellSize : cellSize) - 8 + 'px';
-        el.style.left = b.x * cellSize + 4 + 'px';
-        el.style.top = b.y * cellSize + 4 + 'px';
+        el.style.width = (b.o === 'h' ? b.l * cellSize : cellSize) - 6 + 'px';
+        el.style.height = (b.o === 'v' ? b.l * cellSize : cellSize) - 6 + 'px';
+        el.style.left = b.x * cellSize + 3 + 'px';
+        el.style.top = b.y * cellSize + 3 + 'px';
         if(b.k) el.innerHTML = '🔑';
 
-        // GESTIONE MOVIMENTO (DRAG)
         el.onpointerdown = (e) => {
             el.setPointerCapture(e.pointerId);
             let startCoord = b.o === 'h' ? e.clientX : e.clientY;
-            let startIdx = b.o === 'h' ? b.x : b.y;
+            let startPos = b.o === 'h' ? b.x : b.y;
 
             el.onpointermove = (em) => {
                 let currentCoord = b.o === 'h' ? em.clientX : em.clientY;
                 let diff = Math.round((currentCoord - startCoord) / cellSize);
-                let target = startIdx + diff;
+                let target = startPos + diff;
 
-                if (tryMove(i, target)) {
+                if (canMove(i, target)) {
                     if (b.o === 'h') b.x = target; else b.y = target;
-                    el.style.left = b.x * cellSize + 4 + 'px';
-                    el.style.top = b.y * cellSize + 4 + 'px';
+                    el.style.left = b.x * cellSize + 3 + 'px';
+                    el.style.top = b.y * cellSize + 3 + 'px';
                 }
             };
 
@@ -71,66 +58,54 @@ function render() {
                 el.onpointermove = null;
                 moves++;
                 document.getElementById('move-num').innerText = moves;
-                if (b.k && b.x === 4) handleWin();
+                if (b.k && b.x === 4) win();
             };
         };
         grid.appendChild(el);
     });
 }
 
-function tryMove(idx, newVal) {
-    const b = currentBlocks[idx];
-    if (newVal < 0 || newVal + b.l > 6) return false;
-    
-    // Controlla collisioni con altri blocchi
-    for (let i = 0; i < currentBlocks.length; i++) {
+function canMove(idx, val) {
+    const b = blocks[idx];
+    if (val < 0 || val + b.l > 6) return false;
+    for (let i = 0; i < blocks.length; i++) {
         if (i === idx) continue;
-        const other = currentBlocks[i];
-        let nextX = b.o === 'h' ? newVal : b.x;
-        let nextY = b.o === 'v' ? newVal : b.y;
-        if (isColliding(nextX, nextY, b.l, b.o, other)) return false;
+        const o = blocks[i];
+        let bx = b.o === 'h' ? val : b.x;
+        let by = b.o === 'v' ? val : b.y;
+        let bw = b.o === 'h' ? b.l : 1, bh = b.o === 'v' ? b.l : 1;
+        let ow = o.o === 'h' ? o.l : 1, oh = o.o === 'v' ? o.l : 1;
+        if (bx < o.x + ow && bx + bw > o.x && by < o.y + oh && by + bh > o.y) return false;
     }
     return true;
 }
 
-function isColliding(x, y, l, o, b2) {
-    let w1 = o === 'h' ? l : 1, h1 = o === 'v' ? l : 1;
-    let w2 = b2.o === 'h' ? b2.l : 1, h2 = b2.o === 'v' ? b2.l : 1;
-    return x < b2.x + w2 && x + w1 > b2.x && y < b2.y + h2 && y + h1 > b2.y;
-}
-
-// --- GESTIONE STATI ---
-function handleWin() {
-    xp += 20;
-    lvl++;
-    localStorage.setItem('mkey_xp_v2', xp);
-    localStorage.setItem('mkey_lvl_v2', lvl);
+function win() {
+    xp += 50;
+    currentLevelIdx++;
+    localStorage.setItem('mk_lvl', currentLevelIdx);
+    localStorage.setItem('mk_xp', xp);
     setTimeout(() => {
-        alert("SBLOCCATO!");
-        generateLevel();
-    }, 200);
+        alert("COMPLETATO! +50 XP");
+        loadLevel(currentLevelIdx);
+    }, 250);
 }
 
-function resetCurrentLevel() {
-    currentBlocks = JSON.parse(JSON.stringify(initialLayout));
-    moves = 0;
-    document.getElementById('move-num').innerText = moves;
-    render();
+function resetLevel() {
+    loadLevel(currentLevelIdx);
 }
 
-function startNewLevel() {
-    generateLevel();
+function nextLevel() {
+    currentLevelIdx++;
+    loadLevel(currentLevelIdx);
 }
 
 function updateUI() {
-    document.getElementById('lvl-num').innerText = lvl;
-    document.getElementById('move-num').innerText = moves;
-    const progress = xp % 100;
-    document.getElementById('rank-bar').style.width = progress + "%";
-    
-    const titles = ["WOOD NOVICE", "CARPENTER", "LOCKSMITH", "KEY MASTER", "LEGEND"];
-    document.getElementById('rank-text').innerText = titles[Math.min(Math.floor(xp/100), 4)];
+    document.getElementById('lvl-num').innerText = currentLevelIdx + 1;
+    document.getElementById('xp-val').innerText = xp;
+    document.getElementById('rank-fill').style.width = (xp % 200) / 2 + "%";
+    const ranks = ["NOVICE", "CLEVER", "WOOD-MASTER", "KEY-LEGEND"];
+    document.getElementById('rank-name').innerText = ranks[Math.min(Math.floor(xp/200), 3)];
 }
 
-// Inizializzazione
-generateLevel();
+loadLevel(currentLevelIdx);
