@@ -1,79 +1,92 @@
 let peer, connections = [];
-let myName = "";
 let isHost = false;
-let gameState = { players: [], secretWord: "", impostorWord: "", impostorIndex: -1 };
+let myName = "Victim_" + Math.floor(Math.random() * 999);
+let players = []; 
 
-// Database parole: Segreta vs Impostore
-const WORD_PAIRS = [
-    { s: "Pizza", i: "Focaccia" },
-    { s: "Gatto", i: "Cane" },
-    { s: "Smartphone", i: "Tablet" },
-    { s: "Mare", i: "Piscina" }
+const WORD_DATABASE = [
+    { s: "COLTELLO", i: "FORCHETTA" },
+    { s: "VELENO", i: "ACQUA" },
+    { s: "CIMITERO", i: "CHIESA" },
+    { s: "SANGUE", i: "VERNICE" }
 ];
 
-function initPeer(asHost) {
-    myName = document.getElementById('username').value || "Giocatore_" + Math.floor(Math.random()*100);
-    isHost = asHost;
+// --- XP SYSTEM (LOCAL STORAGE) ---
+let myXP = parseInt(localStorage.getItem('mm_xp')) || 0;
+
+function addXP(amount) {
+    myXP += amount;
+    localStorage.setItem('mm_xp', myXP);
+    updateXPUI();
+}
+
+function updateXPUI() {
+    const fill = document.getElementById('xp-fill');
+    const label = document.getElementById('xp-label');
+    fill.style.width = Math.min(myXP, 100) + "%";
+    label.innerText = `BLOOD_SPILLED: ${myXP}`;
+}
+
+// --- NETWORK CORE ---
+function initPeer(host) {
+    isHost = host;
     peer = new Peer();
 
-    peer.on('open', (id) => {
-        if(isHost) {
-            document.getElementById('my-id').innerText = id;
-            document.getElementById('host-controls').classList.remove('hidden');
-            addPlayerToLobby(myName, peer.id);
-        } else {
-            const hostId = document.getElementById('join-id').value;
-            const conn = peer.connect(hostId);
-            setupConnection(conn);
-        }
-    });
-
-    peer.on('connection', (conn) => {
-        setupConnection(conn);
-    });
-}
-
-function setupConnection(conn) {
-    connections.push(conn);
-    conn.on('data', (data) => {
-        if (data.type === "LOBBY_UPDATE") updateLobbyUI(data.players);
-        if (data.type === "START_GAME") renderGame(data);
-        if (data.type === "CLUE") addMessage(data.sender, data.text);
-        if (data.type === "JOIN") {
-            addPlayerToLobby(data.name, conn.peer);
-            broadcast({ type: "LOBBY_UPDATE", players: gameState.players });
-        }
-    });
-
-    conn.on('open', () => {
-        if (!isHost) conn.send({ type: "JOIN", name: myName });
-    });
-}
-
-function addPlayerToLobby(name, id) {
-    gameState.players.push({ name, id });
-    updateLobbyUI(gameState.players);
-}
-
-function updateLobbyUI(players) {
-    const list = document.getElementById('lobby-list');
-    list.innerHTML = players.map(p => `<li>${p.name} ✅</li>`).join('');
-}
-
-function startGame() {
-    if (gameState.players.length < 2) return alert("Servono almeno 2 persone (o bot)!");
-    
-    const pair = WORD_PAIRS[Math.floor(Math.random() * WORD_PAIRS.length)];
-    const impIndex = Math.floor(Math.random() * gameState.players.length);
-
-    gameState.players.forEach((p, index) => {
-        const payload = {
-            type: "START_GAME",
-            role: (index === impIndex) ? "IMPOSTORE" : "INNOCENTE",
-            word: (index === impIndex) ? pair.i : pair.s
-        };
+    peer.on('open', id => {
+        document.getElementById('my-id').innerText = id;
+        document.getElementById('status-text').innerText = isHost ? "HOSTING_MURDER" : "VICTIM_CONNECTED";
         
-        if (p.id === peer.id) renderGame(payload);
+        if(isHost) {
+            document.getElementById('lobby-section').classList.remove('hidden');
+            document.getElementById('start-btn').classList.remove('hidden');
+            players.push({ name: myName, id: id });
+            updateLobbyUI();
+        } else {
+            const hostId = document.getElementById('peer-id-input').value.trim();
+            if(!hostId) return alert("Enter Host Code!");
+            const conn = peer.connect(hostId);
+            handleConnection(conn);
+        }
+    });
+
+    peer.on('connection', handleConnection);
+}
+
+function handleConnection(conn) {
+    connections.push(conn);
+    conn.on('open', () => {
+        if(!isHost) conn.send({ type: 'JOIN', name: myName });
+    });
+
+    conn.on('data', data => {
+        if(data.type === 'JOIN' && isHost) {
+            players.push({ name: data.name, id: conn.peer });
+            broadcast({ type: 'SYNC', players: players });
+            updateLobbyUI();
+        }
+        if(data.type === 'SYNC') { players = data.players; updateLobbyUI(); }
+        if(data.type === 'START') startGameUI(data.role, data.word);
+        if(data.type === 'MSG') logMurder(data.sender, data.text);
+    });
+}
+
+function updateLobbyUI() {
+    const list = document.getElementById('player-list');
+    list.innerHTML = players.map(p => `<li>${p.name} <span style="color:red">READY</span></li>`).join('');
+    document.getElementById('lobby-section').classList.remove('hidden');
+}
+
+// --- GAME ACTIONS ---
+function hostStartGame() {
+    const pair = WORD_DATABASE[Math.floor(Math.random() * WORD_DATABASE.length)];
+    const impIdx = Math.floor(Math.random() * players.length);
+
+    players.forEach((p, i) => {
+        const payload = {
+            type: 'START',
+            role: (i === impIdx) ? 'IMPOSTOR' : 'INNOCENT',
+            word: (i === impIdx) ? pair.i : pair.s
+        };
+        if(p.id === peer.id) startGameUI(payload.role, payload.word);
         else {
             const c = connections.find(conn => conn.peer === p.id);
             if(c) c.send(payload);
@@ -81,45 +94,40 @@ function startGame() {
     });
 }
 
-function renderGame(data) {
-    document.getElementById('setup-menu').classList.add('hidden');
+function startGameUI(role, word) {
+    document.getElementById('setup-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
-    document.getElementById('display-role').innerText = "Ruolo: " + data.role;
-    document.getElementById('display-word').innerText = "Parola: " + data.word;
-    
-    // Salvataggio automatico partecipazione (Local Storage)
-    let scores = JSON.parse(localStorage.getItem('masterMurder_scores')) || {};
-    scores[myName] = (scores[myName] || 0) + 1; // 1 punto solo per aver iniziato
-    localStorage.setItem('masterMurder_scores', JSON.stringify(scores));
-    renderScoreboard();
+    document.getElementById('role-tag').innerText = "STATUS: " + role;
+    document.getElementById('secret-word').innerText = word;
+    addXP(10); // Salvataggio automatico punti per partecipazione
 }
 
 function sendClue() {
-    const val = document.getElementById('clue-input').value;
-    if(!val) return;
-    
-    const msg = { type: "CLUE", sender: myName, text: val };
-    addMessage("Tu", val);
+    const input = document.getElementById('clue-input');
+    if(!input.value) return;
+    const msg = { type: 'MSG', sender: myName, text: input.value };
+    logMurder("YOU", input.value);
     broadcast(msg);
-    document.getElementById('clue-input').value = "";
+    input.value = "";
+}
+
+function logMurder(sender, text) {
+    const logs = document.getElementById('murder-logs');
+    logs.innerHTML += `<div><span style="color:white">> [${sender}]:</span> ${text}</div>`;
+    logs.scrollTop = logs.scrollHeight;
 }
 
 function broadcast(data) {
     connections.forEach(c => c.send(data));
 }
 
-function addMessage(sender, text) {
-    const chat = document.getElementById('chat-area');
-    chat.innerHTML += `<p><strong>${sender}:</strong> ${text}</p>`;
-    chat.scrollTop = chat.scrollHeight;
+function startBotMode() {
+    startGameUI("AGENT_TRAINING", "SANGUE");
+    setTimeout(() => logMurder("BOT_RED", "Sembra qualcosa di denso..."), 2000);
 }
 
-function renderScoreboard() {
-    const list = document.getElementById('score-list');
-    const scores = JSON.parse(localStorage.getItem('masterMurder_scores')) || {};
-    list.innerHTML = Object.entries(scores)
-        .sort((a,b) => b[1] - a[1])
-        .map(([n, p]) => `<li>${n}: ${p} pt</li>`).join('');
+function copyId() {
+    navigator.clipboard.writeText(document.getElementById('my-id').innerText);
 }
 
-window.onload = renderScoreboard;
+window.onload = updateXPUI;
