@@ -1,85 +1,65 @@
 :root {
-    --blood-red: #8b0000;
-    --dark-crimson: #4a0000;
-    --death-black: #050505;
-    --pure-red: #ff0000;
+    --crimson: #8b0000;
+    --bright-red: #ff0000;
+    --gold: #ffcc00;
+    --cell: 55px;
 }
 
 body {
-    background: var(--death-black);
-    color: #ccc;
+    background: #050505;
+    color: #eee;
     font-family: 'Courier New', monospace;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    height: 100vh;
     margin: 0;
-    overflow: hidden;
 }
 
-.blood-container { width: 95%; max-width: 400px; }
+.game-container { width: 350px; text-align: center; }
 
-.murder-title {
-    text-align: center;
-    color: #fff;
-    letter-spacing: 4px;
-    text-shadow: 0 0 10px var(--blood-red);
-}
+/* Rank Bar Style */
+.rank-panel { margin-bottom: 20px; }
+.rank-info { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px; color: var(--crimson); font-weight: bold; }
+.rank-bar-bg { background: #1a1a1a; height: 10px; border: 1px solid var(--crimson); border-radius: 5px; overflow: hidden; }
+.rank-bar-fill { background: var(--bright-red); height: 100%; width: 0%; box-shadow: 0 0 10px var(--bright-red); transition: width 0.5s ease; }
 
-.murder-title span { color: var(--pure-red); animation: flicker 2s infinite; }
-
-.terminal-card {
-    background: rgba(15, 0, 0, 0.9);
-    border: 1px solid var(--dark-crimson);
-    padding: 20px;
-    box-shadow: 0 0 20px rgba(139, 0, 0, 0.2);
-    min-height: 450px;
-    display: flex;
-    flex-direction: column;
-}
-
-.id-display { font-size: 1.8rem; color: var(--pure-red); text-align: center; margin-bottom: 5px; font-weight: bold; }
-
-.btn-main, .btn-action, .btn-send, .btn-bot {
-    width: 100%;
-    background: var(--dark-crimson);
-    border: 1px solid var(--blood-red);
-    color: #fff;
-    padding: 12px;
-    margin: 8px 0;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.3s;
-}
-
-.btn-main:hover { background: var(--blood-red); box-shadow: 0 0 10px var(--pure-red); }
-
-#murder-logs {
-    flex-grow: 1;
-    background: #000;
-    border: 1px solid #1a0000;
-    margin: 15px 0;
+#grid-container {
+    position: relative;
     padding: 10px;
-    overflow-y: auto;
-    font-size: 0.85rem;
-    color: #ff9999;
+    background: #111;
+    border: 2px solid var(--crimson);
 }
 
-.role-reveal {
-    border-bottom: 2px solid var(--blood-red);
-    padding-bottom: 10px;
-    text-align: center;
+.grid {
+    position: relative;
+    width: calc(var(--cell) * 6);
+    height: calc(var(--cell) * 6);
 }
 
-#secret-word { font-size: 1.6rem; color: var(--pure-red); letter-spacing: 2px; }
-
-.xp-bar-bg { background: #1a0000; height: 6px; width: 100%; margin-top: 5px; }
-.xp-bar-fill { background: var(--pure-red); height: 100%; width: 0%; box-shadow: 0 0 8px var(--pure-red); transition: 1s; }
-.xp-label { font-size: 0.7rem; color: var(--blood-red); margin-bottom: 15px; }
-
-.hidden { display: none !important; }
-
-@keyframes flicker {
-    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
-    20%, 22%, 24%, 55% { opacity: 0; }
+.block {
+    position: absolute;
+    background: #300000;
+    border: 1px solid var(--crimson);
+    border-radius: 4px;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
 }
+
+.key-block { background: linear-gradient(45deg, var(--gold), #886600); border-color: #fff; z-index: 10; }
+
+.btn-blood {
+    background: var(--crimson);
+    color: white;
+    border: none;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.btn-blood:hover { background: var(--bright-red); }
