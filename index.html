@@ -3,91 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MasterKey: Transcendence</title>
+    <title>MasterKey Elite</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body class="skin-wood">
-    <div id="weather-layer"></div>
-    
-    <div class="main-container">
-        <div class="side-panel">
-            <div class="box">
-                <h4>MEMORIE</h4>
-                <button class="btn-ui" onclick="toggleDiary()">📖 DIARIO</button>
-                <button class="btn-ui" onclick="toggleShop()">💎 SHOP</button>
+    <div class="game-wrapper">
+        <header>
+            <div class="brand">MASTER<span>KEY</span></div>
+            <div class="stats-bar">
+                <div class="stat-pill">LVL <span id="lvl">1</span></div>
+                <div class="stat-pill">XP <span id="xp">0</span></div>
             </div>
-        </div>
+        </header>
 
-        <div class="game-core">
-            <div id="boss-warning" class="boss-ui hidden">ATTENZIONE: IL GRANDE FALEGNAME</div>
+        <main class="game-area">
+            <div class="board-container">
+                <div id="grid" class="board"></div>
+                <div class="exit-guide"></div>
+            </div>
+        </main>
+
+        <section class="ui-footer">
+            <div class="progress-container">
+                <div class="progress-label">PROSSIMO RANGO: <span id="rank">NOVIZIO</span></div>
+                <div class="bar-bg"><div id="xp-bar" class="bar-fill"></div></div>
+            </div>
             
-            <div class="hud">
-                <div class="stat">LVL <span id="lvl-display">1</span></div>
-                <div class="stat">XP <span id="xp-val">0</span></div>
-                <div class="stat" id="timer">00:00</div>
+            <div class="button-grid">
+                <button class="btn btn-reset" onclick="resetCurrentLevel()">RESET</button>
+                <button class="btn btn-hint" onclick="useSmartHint()">SUGGERIMENTO</button>
+                <button class="btn btn-shop" onclick="toggleShop()">SKINS</button>
             </div>
-
-            <div class="board-wrapper">
-                <div id="grid" class="grid-canvas"></div>
-                <div class="exit-gate"></div>
-            </div>
-
-            <div class="xp-section">
-                <div class="rank-text"><span id="world-name">FORESTA ANTICA</span> - <span id="rank-name">NOVIZIO</span></div>
-                <div class="xp-track"><div id="xp-bar" class="xp-bar"></div></div>
-            </div>
-
-            <div class="controls">
-                <button class="btn-main" onclick="resetCurrentLevel()">RESTART</button>
-                <button class="btn-main gold-btn" onclick="useSmartHint()">HINT (50 XP)</button>
-            </div>
-        </div>
-
-        <div class="side-panel">
-            <div class="box">
-                <h4>STAT</h4>
-                <p>Mosse: <span id="move-count">0</span></p>
-                <p>Mondo: <span id="world-status">Wood</span></p>
-            </div>
-        </div>
+        </section>
     </div>
 
     <div id="shop-overlay" class="overlay hidden">
         <div class="modal">
-            <h2>MERCANTE DI OMBRE</h2>
-            <div class="skin-grid">
-                <div class="skin-card" onclick="buySkin('wood', 0)">
-                    <div class="preview wood-p"></div>
-                    <p>Legno</p>
-                </div>
-                <div class="skin-card" onclick="buySkin('marble', 500)">
-                    <div class="preview marble-p"></div>
-                    <p>Marmo (500)</p>
-                </div>
-                <div class="skin-card" onclick="buySkin('liquid', 2000)">
-                    <div class="preview liquid-p"></div>
-                    <p>Metallo (2000)</p>
-                </div>
+            <h3>IL MERCANTE</h3>
+            <div class="skin-list">
+                <button class="skin-opt" onclick="applySkin('wood')">LEGNO NOBILE</button>
+                <button class="skin-opt" onclick="applySkin('marble')">MARMO BIANCO</button>
+                <button class="skin-opt" onclick="applySkin('neon')">VUOTO NEON</button>
             </div>
-            <button class="btn-main" onclick="toggleShop()">CHIUDI</button>
-        </div>
-    </div>
-
-    <div id="qr-overlay" class="overlay hidden">
-        <div class="modal qr-modal">
-            <h2 class="gold-text">ASCENSIONE COMPLETATA</h2>
-            <div id="qrcode-container"></div>
-            <p>Il tuo destino è sigillato.</p>
-            <button class="btn-main" onclick="triggerRebirth()">ABBRACCIA IL VUOTO</button>
-        </div>
-    </div>
-
-    <div id="diary-overlay" class="overlay hidden">
-        <div class="modal">
-            <h2>DIARIO DEL NAUFRAGO</h2>
-            <div id="diary-content"></div>
-            <button class="btn-main" onclick="toggleDiary()">CHIUDI</button>
+            <button class="btn-close" onclick="toggleShop()">CHIUDI</button>
         </div>
     </div>
 
