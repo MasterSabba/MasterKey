@@ -2,43 +2,55 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>MasterMurder P2P</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MasterMurder - Crimson Edition</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 </head>
 <body>
-    <div id="game-container">
-        <h1>MasterMurder 🔪</h1>
-        
-        <div id="setup-menu">
-            <input type="text" id="username" placeholder="Tuo Nome">
-            <hr>
-            <button onclick="initPeer(true)">Crea Partita (Host)</button>
-            <div id="host-controls" class="hidden">
-                <p>Invia questo ID agli amici: <b id="my-id">...</b></p>
-                <ul id="lobby-list"></ul>
-                <button onclick="startGame()">INIZIA GIOCO</button>
+    <div class="blood-container">
+        <h1 class="murder-title">MASTER<span>MURDER</span></h1>
+
+        <div id="setup-screen" class="terminal-card">
+            <div class="status-header">
+                <span id="connection-led" class="led-dead"></span>
+                <span id="status-text">SYSTEM_BLEEDING...</span>
             </div>
-            <hr>
-            <input type="text" id="join-id" placeholder="ID dell'Host">
-            <button onclick="initPeer(false)">Unisciti a Partita</button>
+            
+            <div id="my-id" class="id-display">----</div>
+            <button class="btn-action" onclick="copyId()">COPY ACCESS_CODE</button>
+
+            <div class="xp-container">
+                <div class="xp-bar-bg"><div id="xp-fill" class="xp-bar-fill"></div></div>
+                <div id="xp-label" class="xp-label">BLOOD_SPILLED: 0</div>
+            </div>
+
+            <div id="auth-section">
+                <input type="text" id="peer-id-input" placeholder="ENTER TARGET CODE">
+                <button class="btn-main" onclick="initPeer(false)">JOIN MISSION</button>
+                <button class="btn-main" onclick="initPeer(true)">HOST MURDER</button>
+                <button class="btn-bot" onclick="startBotMode()">TRAINING_ROOM (BOTS)</button>
+            </div>
+
+            <div id="lobby-section" class="hidden">
+                <h3 class="red-text">VICTIMS_IN_LOBBY:</h3>
+                <ul id="player-list"></ul>
+                <button id="start-btn" class="btn-main hidden" onclick="hostStartGame()">EXECUTE START</button>
+            </div>
         </div>
 
-        <div id="game-screen" class="hidden">
-            <div id="role-card">
-                <h2 id="display-role">Ruolo: ???</h2>
-                <p id="display-word">Parola: ???</p>
+        <div id="game-screen" class="terminal-card hidden">
+            <div class="role-reveal">
+                <div id="role-tag">YOUR_STATUS:</div>
+                <div id="secret-word">ANALYZING...</div>
             </div>
-            <div id="chat-area"></div>
-            <div id="input-group">
-                <input type="text" id="clue-input" placeholder="Il tuo indizio...">
-                <button onclick="sendClue()">Invia</button>
-            </div>
-        </div>
 
-        <div id="scoreboard">
-            <h3>Punteggi Globali (Local Storage)</h3>
-            <ul id="score-list"></ul>
+            <div id="murder-logs"></div>
+
+            <div class="input-area">
+                <input type="text" id="clue-input" placeholder="TYPE CLUE...">
+                <button class="btn-send" onclick="sendClue()">SEND</button>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
