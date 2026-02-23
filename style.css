@@ -2,78 +2,80 @@
     --cyan: #00f3ff;
     --magenta: #ff00ff;
     --gold: #ffcc00;
-    --glass: rgba(255, 255, 255, 0.1);
     --cell: 52px;
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
 body, html {
     margin: 0; padding: 0; width: 100vw; height: 100vh;
-    overflow: hidden; background: #050505; color: var(--cyan);
-    font-family: 'Orbitron', 'Segoe UI', sans-serif;
-    touch-action: none; /* Impedisce scroll e zoom */
+    overflow: hidden; background: #000; font-family: 'Courier New', monospace;
+    touch-action: none;
 }
 
-/* Sfondo Cyberpunk */
-.cyber-city-bg {
+/* Sfondo con profondità */
+.background-city {
     position: fixed; inset: 0;
-    background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050505 100%);
-    z-index: -1;
+    background: url('https://images.unsplash.com/photo-1605142859862-978be7eba909?auto=format&fit=crop&w=1500&q=80');
+    background-size: cover; background-position: center;
+    filter: blur(8px) brightness(0.3); z-index: -1;
 }
 
-.hud-container {
+.interface {
     height: 100vh; display: flex; flex-direction: column;
-    justify-content: space-between; align-items: center; padding: 20px;
+    justify-content: space-around; align-items: center;
+    padding: 10px;
 }
 
-.hud-box {
-    background: var(--glass); border: 1px solid var(--cyan);
-    padding: 10px 20px; border-radius: 4px; box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
-    text-align: center;
-}
-
-.label { font-size: 0.7rem; display: block; opacity: 0.7; }
-.value { font-size: 1.2rem; font-weight: bold; text-shadow: 0 0 10px var(--cyan); }
-
-/* La Board Olografica */
-.game-frame {
-    position: relative; padding: 10px;
-    border: 2px solid var(--glass); background: rgba(0, 0, 0, 0.6);
-    box-shadow: 0 0 40px rgba(0, 0, 0, 1), inset 0 0 20px rgba(0, 243, 255, 0.1);
-    border-radius: 8px;
-}
-
-.holo-grid {
+/* Board Olografica */
+.holo-board {
     width: 312px; height: 312px; position: relative;
-    background-image: linear-gradient(var(--glass) 1px, transparent 1px),
-                      linear-gradient(90deg, var(--glass) 1px, transparent 1px);
-    background-size: 52px 52px;
+    border: 2px solid var(--cyan);
+    background: rgba(0, 243, 255, 0.05);
+    box-shadow: 0 0 30px rgba(0, 243, 255, 0.2), inset 0 0 20px rgba(0, 243, 255, 0.1);
 }
 
-/* I BLOCCHI WOW (Glassmorphism) */
+.holo-board::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: linear-gradient(var(--cyan) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--cyan) 1px, transparent 1px);
+    background-size: 52px 52px; opacity: 0.3;
+}
+
+/* BLOCCHI HI-TECH */
 .block {
-    position: absolute; border-radius: 4px;
-    backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.1), 0 5px 15px rgba(0,0,0,0.5);
-    transition: filter 0.2s;
+    position: absolute; border-radius: 2px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    display: flex; align-items: center; justify-content: center;
+    /* Effetto "Circuito Interno" */
+    background-image: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 8px 8px;
 }
 
-.block-h { background: rgba(0, 243, 255, 0.15); box-shadow: inset 0 0 10px var(--cyan); }
-.block-v { background: rgba(255, 0, 255, 0.15); box-shadow: inset 0 0 10px var(--magenta); }
+.block-h { 
+    background-color: rgba(0, 243, 255, 0.2); 
+    box-shadow: 0 0 15px var(--cyan), inset 0 0 10px var(--cyan);
+}
 
+.block-v { 
+    background-color: rgba(255, 0, 255, 0.2); 
+    box-shadow: 0 0 15px var(--magenta), inset 0 0 10px var(--magenta);
+}
+
+/* Chiave Olografica con "K" */
 .block-key {
-    background: rgba(255, 204, 0, 0.3); border: 1px solid var(--gold);
-    box-shadow: 0 0 20px var(--gold), inset 0 0 10px var(--gold);
-    z-index: 10;
+    background-color: rgba(255, 204, 0, 0.3);
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 25px var(--gold), inset 0 0 15px var(--gold);
+}
+.block-key::after {
+    content: "K"; color: var(--gold); font-size: 24px; font-weight: bold;
+    text-shadow: 0 0 10px var(--gold);
 }
 
-/* Pulsanti */
-.control-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; width: 312px; }
-.btn-cyber {
-    background: var(--glass); border: 1px solid var(--cyan); color: var(--cyan);
-    padding: 10px; border-radius: 4px; cursor: pointer; font-size: 0.7rem;
+/* UI */
+.top-stats { width: 312px; display: flex; justify-content: space-between; color: var(--cyan); text-shadow: 0 0 5px var(--cyan); }
+.cyber-btn {
+    background: transparent; border: 1px solid var(--cyan); color: var(--cyan);
+    padding: 8px 15px; border-radius: 4px; cursor: pointer; text-transform: uppercase;
 }
-.btn-cyber.active { background: rgba(0, 243, 255, 0.2); box-shadow: 0 0 10px var(--cyan); }
-
-.hidden { display: none; }
+.cyber-btn.active { background: var(--cyan); color: #000; box-shadow: 0 0 15px var(--cyan); }
