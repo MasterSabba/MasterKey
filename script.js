@@ -3,9 +3,10 @@ const cellSize = 50;
 let state = {
     xp: parseInt(localStorage.getItem('mk_xp')) || 0,
     lvl: parseInt(localStorage.getItem('mk_lvl')) || 1,
+    skin: localStorage.getItem('mk_skin') || 'wood',
+    unlocked: JSON.parse(localStorage.getItem('mk_unlocked')) || ['wood'],
     blocks: [],
-    initial: [],
-    skin: localStorage.getItem('mk_skin') || 'wood'
+    initial: []
 };
 
 function init() {
@@ -15,21 +16,18 @@ function init() {
 }
 
 function generateLevel() {
-    // Definizione pezzi numerosi (incrementano con il livello)
-    let layout = [{x: 0, y: 2, l: 2, o: 'h', k: true}]; // La chiave
-    let count = 6 + Math.min(Math.floor(state.lvl / 5), 10); // Parte da 6 pezzi + chiave
+    let layout = [{x: 0, y: 2, l: 2, o: 'h', k: true}];
+    // Molti più pezzi: 10 ostacoli + chiave
+    let count = 10 + Math.min(Math.floor(state.lvl / 3), 6); 
 
     for(let i=0; i<count; i++) {
         let attempts = 0;
-        while(attempts < 150) {
+        while(attempts < 200) {
             attempts++;
-            let l = Math.random() > 0.8 ? 3 : 2;
+            let l = Math.random() > 0.7 ? 3 : 2;
             let o = Math.random() > 0.5 ? 'h' : 'v';
             let x = Math.floor(Math.random() * (6 - (o === 'h' ? l : 0)));
             let y = Math.floor(Math.random() * (6 - (o === 'v' ? l : 0)));
-
-            // No pezzi sopra la chiave all'inizio
-            if (o === 'v' && x > 3 && y < 3) continue;
 
             if(!layout.some(b => checkCollision(x, y, l, o, b))) {
                 layout.push({x, y, l, o, k: false});
@@ -51,15 +49,18 @@ function render() {
         div.style.height = (b.o === 'v' ? b.l * cellSize : cellSize) - 6 + 'px';
         div.style.left = b.x * cellSize + 3 + 'px';
         div.style.top = b.y * cellSize + 3 + 'px';
-        if(b.k) div.innerHTML = '🔑';
+        if(b.k) div.innerText = "🗝️";
 
         div.onpointerdown = (e) => {
+            e.preventDefault(); // Blocca scroll durante il tocco
             div.setPointerCapture(e.pointerId);
-            let start = b.o === 'h' ? e.clientX : e.clientY;
-            let currentPos = b.o === 'h' ? b.x : b.y;
+            let startX = e.clientX, startY = e.clientY;
+            let ox = b.x, oy = b.y;
 
             div.onpointermove = (em) => {
-                let target = currentPos + Math.round(((b.o === 'h' ? em.clientX : em.clientY) - start) / cellSize);
+                let diff = b.o === 'h' ? (em.clientX - startX) : (em.clientY - startY);
+                let target = (b.o === 'h' ? ox : oy) + Math.round(diff / cellSize);
+                
                 if(canMove(i, target)) {
                     if(b.o === 'h') b.x = target; else b.y = target;
                     div.style.left = b.x * cellSize + 3 + 'px';
@@ -75,6 +76,7 @@ function render() {
     });
 }
 
+// (Le funzioni canMove, checkCollision e updateUI restano simili alle precedenti)
 function canMove(idx, val) {
     const b = state.blocks[idx];
     if(val < 0 || val + b.l > 6) return false;
@@ -96,41 +98,49 @@ function checkCollision(x, y, l, o, other) {
 }
 
 function win() {
-    state.xp += 25;
+    state.xp += 50;
     state.lvl++;
-    localStorage.setItem('mk_xp', state.xp);
-    localStorage.setItem('mk_lvl', state.lvl);
-    alert("LIVELLO COMPLETATO!");
+    save();
+    alert("Vittoria! +50 XP");
     generateLevel();
     updateUI();
 }
 
+function save() {
+    localStorage.setItem('mk_xp', state.xp);
+    localStorage.setItem('mk_lvl', state.lvl);
+    localStorage.setItem('mk_skin', state.skin);
+    localStorage.setItem('mk_unlocked', JSON.stringify(state.unlocked));
+}
+
+function buySkin(name, cost) {
+    if(state.unlocked.includes(name)) {
+        state.skin = name;
+    } else if(state.xp >= cost) {
+        state.xp -= cost;
+        state.unlocked.push(name);
+        state.skin = name;
+    } else {
+        return alert("XP insufficienti per questa skin!");
+    }
+    save();
+    init();
+    toggleShop();
+}
+
+function toggleShop() { document.getElementById('shop').classList.toggle('hidden'); }
 function updateUI() {
     document.getElementById('lvl').innerText = state.lvl;
     document.getElementById('xp').innerText = state.xp;
     document.getElementById('xp-bar').style.width = (state.xp % 100) + "%";
 }
-
-function resetCurrentLevel() {
-    state.blocks = JSON.parse(JSON.stringify(state.initial));
-    render();
-}
-
-function useSmartHint() {
-    if(state.xp < 20) return alert("XP insufficienti!");
-    state.xp -= 20;
-    updateUI();
+function resetLevel() { state.blocks = JSON.parse(JSON.stringify(state.initial)); render(); }
+function useHint() {
+    if(state.xp < 50) return alert("Ti servono 50 XP!");
+    state.xp -= 50; updateUI();
     const key = grid.querySelector('.block-key');
-    key.style.filter = "brightness(2)";
-    setTimeout(() => key.style.filter = "", 1000);
-}
-
-function toggleShop() { document.getElementById('shop-overlay').classList.toggle('hidden'); }
-function applySkin(s) {
-    state.skin = s;
-    localStorage.setItem('mk_skin', s);
-    document.body.className = 'skin-' + s;
-    toggleShop();
+    key.style.filter = "brightness(3)";
+    setTimeout(() => key.style.filter = "", 800);
 }
 
 init();
