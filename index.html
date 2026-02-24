@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURAL KEY: OVERRIDE</title>
+    <title>MasterKey: Wood Workshop</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="stars-bg"></div>
-    <div class="game-wrapper">
+    <div class="workshop-env">
         <div class="header">
-            <div class="stat-box">NODE <span id="lvl-val">1</span></div>
-            <div class="stat-box gold">XP <span id="xp-val">0</span></div>
+            <div class="stat">LIVELLO <span id="lvl-val">1</span></div>
+            <div class="stat gold">XP <span id="xp-val">0</span></div>
         </div>
 
-        <div class="board-area">
-            <div id="grid" class="holo-grid"></div>
-            <div class="exit-gate"></div>
+        <div class="table-surface">
+            <div class="board-frame">
+                <div id="grid" class="wood-grid"></div>
+                <div class="exit-notch"></div>
+            </div>
         </div>
 
-        <div class="controls">
-            <button class="btn" onclick="resetLevel()">REBOOT</button>
-            <button class="btn hint" onclick="useHint()">SCAN</button>
+        <div class="footer">
+            <button class="wood-btn" onclick="resetLevel()">RESET</button>
+            <button class="wood-btn accent" onclick="useHint()">AIUTO</button>
         </div>
     </div>
     <script src="script.js"></script>
