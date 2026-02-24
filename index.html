@@ -1,25 +1,19 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MasterKey: Solid State</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Slide Key</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="ui">
-        <div>LIVELLO: <span id="lvl">1</span></div>
-        <div>PUNTI: <span id="xp">0</span></div>
-    </div>
-    
-    <div class="board-frame">
-        <div id="grid" class="grid"></div>
-    </div>
 
-    <div class="actions">
-        <button onclick="resetLevel()">RESET</button>
-        <button onclick="nextLevel()">SALTA</button>
-    </div>
-    <script src="script.js"></script>
+<h1>SLIDE KEY</h1>
+<p>Livello: <span id="level">1</span> | Mosse: <span id="moves">0</span></p>
+
+<canvas id="gameCanvas" width="480" height="480"></canvas>
+<br>
+<button onclick="resetLevel()">Reset</button>
+
+<script src="game.js"></script>
 </body>
 </html>
