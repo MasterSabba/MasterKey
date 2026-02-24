@@ -1,19 +1,20 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-  <meta charset="UTF-8">
-  <title>Slide Key</title>
-  <link rel="stylesheet" href="style.css">
+<!DOCTYPE html> <!-- Html 5 -->
+<html lang="it"> <!-- Italiano -->
+  
+<head> <!-- Info che non si vedono  -->
+<meta charset="UTF-8"> <!-- Permette l'usco di caratteri come accenti, simboli...  -->
+<title>Free The Key Mini</title> <!-- Titolo nella barra di ricerca -->
+<link rel="stylesheet" href="style.css"> <!-- Collega il css  -->
 </head>
-<body>
+  
+<body> <!-- Info che si vedono  -->
+<h1>Free The Key</h1> <!-- Titolo grosso -->
+<p>Livello: <span id="level">1</span> | Mosse: <span id="moves">0</span></p> <!-- Mostra livello e mosse, span id = per aggiornare il js-->
+<canvas id="gameCanvas" width="400" height="400"></canvas> <!-- comunica con js riguardo la griglia, dove creerò la griglia in css --> 
+<br> <!-- a capo --> 
+<button onclick="resetLevel()">Reset</button> <!-- Pulsante che se cliccato attiva la funzione reserLevel  -->
 
-<h1>SLIDE KEY</h1>
-<p>Livello: <span id="level">1</span> | Mosse: <span id="moves">0</span></p>
-
-<canvas id="gameCanvas" width="480" height="480"></canvas>
-<br>
-<button onclick="resetLevel()">Reset</button>
-
-<script src="game.js"></script>
+<script src="game.js"></script> <!-- Collega il js -->
 </body>
+  
 </html>
