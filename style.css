@@ -1,53 +1,39 @@
-/* Centratura totale della pagina */
 body {
     margin: 0;
-    padding: 0;
     height: 100vh;
-    display: flex;
+    display: flex; /* Flexbox per centrare tutto */
     justify-content: center;
     align-items: center;
     background: #1a110a;
     color: #f0e6d2;
-    font-family: 'Segoe UI', sans-serif;
-    overflow: hidden;
-    touch-action: none;
+    font-family: Arial, sans-serif;
+    touch-action: none; /* Impedisce scroll accidentali */
 }
 
-.game-container {
-    text-align: center;
-}
+.game-container { text-align: center; } /* Centra i testi */
 
-.info-bar {
-    margin-bottom: 15px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    font-size: 1.1rem;
-}
+.stats { display: flex; justify-content: center; gap: 15px; font-weight: bold; }
 
-/* Cornice di legno esterna */
 .board-frame {
     display: inline-block;
     padding: 12px;
     background: #3d2616;
     border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.8);
     border: 3px solid #2a180d;
 }
 
-/* Griglia interna scavata */
 .grid {
-    width: 300px;
-    height: 300px;
-    position: relative;
+    width: 300px; height: 300px;
+    position: relative; /* Indispensabile per posizionare i blocchi con JS */
     background: #2a180d;
     border-radius: 10px;
     box-shadow: inset 6px 6px 15px rgba(0,0,0,0.6);
 }
 
-/* I Blocchi di Legno */
+/* Stile dei blocchi legno */
 .block {
-    position: absolute; /* Fondamentale per posizionarli con JS */
+    position: absolute; /* Permette al JS di usare left e top */
     border-radius: 14px;
     box-sizing: border-box;
     border: 3px solid #5a3a1f;
@@ -56,28 +42,14 @@ body {
                 inset 4px 4px 8px rgba(255,255,255,0.15),
                 6px 6px 12px rgba(0,0,0,0.5);
     cursor: grab;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
-/* La Chiave d'oro */
-.block-key {
-    background: linear-gradient(145deg, #ffd700, #b8860b);
-    border-color: #d4af37;
-    z-index: 10;
-}
+.block-key { background: linear-gradient(145deg, #ffd700, #b8860b); border-color: #d4af37; z-index: 10; }
 
 button {
-    margin: 20px 5px;
-    padding: 10px 25px;
-    background: #5a3a1f;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
+    margin-top: 20px; padding: 10px 20px;
+    background: #5a3a1f; color: white; border: none;
+    border-radius: 8px; font-weight: bold; cursor: pointer;
     box-shadow: 0 4px 0 #000;
 }
-
 button:active { transform: translateY(2px); box-shadow: 0 2px 0 #000; }
