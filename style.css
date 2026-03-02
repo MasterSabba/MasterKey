@@ -1,64 +1,67 @@
+/* Centratura totale della pagina */
 body {
     margin: 0;
     padding: 0;
-    height: 100vh; /* Prende tutta l'altezza dello schermo */
+    height: 100vh;
     display: flex;
-    justify-content: center; /* Centra orizzontalmente */
-    align-items: center; /* Centra verticalmente */
-    background: #1a110a; /* Sfondo scuro */
+    justify-content: center;
+    align-items: center;
+    background: #1a110a;
     color: #f0e6d2;
-    font-family: Arial, sans-serif;
-    touch-action: none; /* Blocca lo scroll per non disturbare il gioco */
+    font-family: 'Segoe UI', sans-serif;
+    overflow: hidden;
+    touch-action: none;
 }
 
-.main-wrapper {
-    text-align: center; /* Centra i testi dentro il contenitore */
+.game-container {
+    text-align: center;
 }
 
-.stats {
+.info-bar {
+    margin-bottom: 15px;
     display: flex;
     justify-content: center;
     gap: 20px;
-    margin-bottom: 10px;
+    font-size: 1.1rem;
 }
 
 /* Cornice di legno esterna */
 .board-frame {
     display: inline-block;
-    padding: 10px;
+    padding: 12px;
     background: #3d2616;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    border: 2px solid #2a180d;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+    border: 3px solid #2a180d;
 }
 
-/* Griglia interna (6 caselle x 50px = 300px) */
+/* Griglia interna scavata */
 .grid {
     width: 300px;
     height: 300px;
-    position: relative; /* Necessario per posizionare i blocchi dentro */
+    position: relative;
     background: #2a180d;
     border-radius: 10px;
-    box-shadow: inset 5px 5px 15px rgba(0,0,0,0.6);
-    overflow: hidden; /* Evita che i pezzi escano visivamente */
+    box-shadow: inset 6px 6px 15px rgba(0,0,0,0.6);
 }
 
-/* Stile Neumorphic dei blocchi di legno */
+/* I Blocchi di Legno */
 .block {
-    position: absolute; /* Permette al JS di muoverli con left e top */
+    position: absolute; /* Fondamentale per posizionarli con JS */
     border-radius: 14px;
     box-sizing: border-box;
     border: 3px solid #5a3a1f;
     background: linear-gradient(145deg, #9b6b3d, #7a4f28);
-    
-    /* Luci e ombre per l'effetto 3D */
     box-shadow: inset -4px -4px 8px rgba(0,0,0,0.4),
                 inset 4px 4px 8px rgba(255,255,255,0.15),
                 6px 6px 12px rgba(0,0,0,0.5);
     cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* La chiave d'oro deve risaltare */
+/* La Chiave d'oro */
 .block-key {
     background: linear-gradient(145deg, #ffd700, #b8860b);
     border-color: #d4af37;
@@ -66,14 +69,14 @@ body {
 }
 
 button {
-    margin-top: 20px;
-    padding: 10px 20px;
+    margin: 20px 5px;
+    padding: 10px 25px;
     background: #5a3a1f;
     color: white;
     border: none;
     border-radius: 8px;
-    cursor: pointer;
     font-weight: bold;
+    cursor: pointer;
     box-shadow: 0 4px 0 #000;
 }
 
