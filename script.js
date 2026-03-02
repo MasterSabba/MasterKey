@@ -1,6 +1,7 @@
 const cellSize = 50;
 let grid, levelDisp, movesDisp, xpDisp, timerDisp;
 
+// Recupero dati da LocalStorage (come da tua richiesta)
 let level = parseInt(localStorage.getItem('mk_level')) || 1;
 let xp = parseInt(localStorage.getItem('mk_xp')) || 0;
 let moves = 0;
@@ -9,31 +10,36 @@ let timerInterval;
 let blocks = [];
 let initialPos = [];
 
-window.addEventListener('DOMContentLoaded', () => {
+// Aspetta il caricamento completo del DOM
+window.addEventListener('load', () => {
     grid = document.getElementById("grid");
     levelDisp = document.getElementById("level");
     xpDisp = document.getElementById("xp");
     movesDisp = document.getElementById("moves");
     timerDisp = document.getElementById("timer");
 
-    generateLevel();
+    // Piccolo delay per caricare i CSS correttamente
+    setTimeout(() => {
+        generateLevel();
+    }, 100);
 });
 
 function generateLevel() {
-    // Chiave d'oro fissa sulla riga 2
+    // 1. Definiamo la chiave d'oro
     blocks = [{ x: 0, y: 2, l: 2, o: 'h', k: true }];
     
+    // 2. Aggiungiamo blocchi casuali
     let count = 4 + Math.min(level, 6);
     for (let i = 0; i < count; i++) {
         let attempts = 0;
-        while (attempts < 100) {
+        while (attempts < 50) {
             attempts++;
             let l = Math.random() > 0.7 ? 3 : 2;
             let o = Math.random() > 0.5 ? 'h' : 'v';
-            let x = Math.floor(Math.random() * (6 - (o === 'h' ? l : 0)));
-            let y = Math.floor(Math.random() * (6 - (o === 'v' ? l : 0)));
+            let x = Math.floor(Math.random() * (6 - (o === 'h' ? l : 1)));
+            let y = Math.floor(Math.random() * (6 - (o === 'v' ? l : 1)));
 
-            // Evita la riga della chiave per i blocchi orizzontali per non bloccare subito l'uscita
+            // Non bloccare la riga 2 (quella della chiave) con blocchi orizzontali
             if (o === 'h' && y === 2) continue;
 
             if (!checkCollision(x, y, l, o, -1)) {
@@ -47,7 +53,7 @@ function generateLevel() {
     moves = 0;
     updateUI();
     startTimer();
-    render();
+    render(); // <--- Questa è la funzione che crea i div dei blocchi
 }
 
 function checkCollision(x, y, l, o, ignoreIdx) {
@@ -64,21 +70,32 @@ function checkCollision(x, y, l, o, ignoreIdx) {
 }
 
 function render() {
-    if (!grid) return;
-    // Mantiene l'elemento uscita
-    const exitGate = grid.querySelector('.exit-gate');
+    if (!grid) {
+        console.error("Griglia non trovata!");
+        return;
+    }
+    
+    // Svuota i vecchi blocchi ma lascia l'eventuale uscita
     grid.innerHTML = '';
-    if(exitGate) grid.appendChild(exitGate);
     
     blocks.forEach((b, i) => {
         const div = document.createElement("div");
         div.className = `block ${b.k ? 'block-key' : ''}`;
         
-        div.style.width = (b.o === 'h' ? b.l * cellSize : cellSize) - 6 + "px";
-        div.style.height = (b.o === 'v' ? b.l * cellSize : cellSize) - 6 + "px";
-        div.style.left = b.x * cellSize + 3 + "px";
-        div.style.top = b.y * cellSize + 3 + "px";
+        // Dimensioni (sottraiamo 6 per il bordo)
+        const w = (b.o === 'h' ? b.l * cellSize : cellSize) - 6;
+        const h = (b.o === 'v' ? b.l * cellSize : cellSize) - 6;
+        
+        div.style.width = w + "px";
+        div.style.height = h + "px";
+        div.style.left = (b.x * cellSize + 3) + "px";
+        div.style.top = (b.y * cellSize + 3) + "px";
+        
+        // Assicurati che siano visibili
+        div.style.display = "block";
+        div.style.opacity = "1";
 
+        // Gestione movimento
         div.onpointerdown = (e) => {
             div.setPointerCapture(e.pointerId);
             let startX = e.clientX;
@@ -100,8 +117,8 @@ function render() {
                             b.x = nx; b.y = ny;
                             moves++;
                             updateUI();
-                            div.style.left = b.x * cellSize + 3 + "px";
-                            div.style.top = b.y * cellSize + 3 + "px";
+                            div.style.left = (b.x * cellSize + 3) + "px";
+                            div.style.top = (b.y * cellSize + 3) + "px";
                         }
                     }
                 }
@@ -109,19 +126,22 @@ function render() {
             
             div.onpointerup = () => {
                 div.onpointermove = null;
-                // Vittoria se la chiave occupa le ultime celle a destra
-                if (b.k && b.x === 4) {
-                    setTimeout(() => {
-                        alert("Ottimo lavoro! Livello completato.");
-                        level++; xp += 100;
-                        saveData();
-                        generateLevel();
-                    }, 200);
+                if (b.k && b.x >= 4) {
+                    alert("Livello Completato!");
+                    level++; xp += 100;
+                    saveData();
+                    generateLevel();
                 }
             };
         };
         grid.appendChild(div);
     });
+}
+
+function updateUI() {
+    if(levelDisp) levelDisp.innerText = level;
+    if(xpDisp) xpDisp.innerText = xp;
+    if(movesDisp) movesDisp.innerText = moves;
 }
 
 function startTimer() {
@@ -131,21 +151,8 @@ function startTimer() {
         seconds++;
         let m = Math.floor(seconds / 60).toString().padStart(2, '0');
         let s = (seconds % 60).toString().padStart(2, '0');
-        timerDisp.innerText = `${m}:${s}`;
+        if(timerDisp) timerDisp.innerText = `${m}:${s}`;
     }, 1000);
-}
-
-function updateUI() {
-    if(levelDisp) levelDisp.innerText = level;
-    if(xpDisp) xpDisp.innerText = xp;
-    if(movesDisp) movesDisp.innerText = moves;
-}
-
-function resetLevel() {
-    blocks = JSON.parse(JSON.stringify(initialPos));
-    moves = 0;
-    updateUI();
-    render();
 }
 
 function saveData() {
@@ -153,10 +160,9 @@ function saveData() {
     localStorage.setItem('mk_xp', xp);
 }
 
-function useHint() {
-    const key = document.querySelector('.block-key');
-    if(key) {
-        key.style.filter = "brightness(1.8)";
-        setTimeout(() => key.style.filter = "none", 500);
-    }
+function resetLevel() {
+    blocks = JSON.parse(JSON.stringify(initialPos));
+    moves = 0;
+    updateUI();
+    render();
 }
