@@ -1,24 +1,31 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8"> <title>Free The Key: Wood Edition</title>
-    <link rel="stylesheet" href="style.css"> </head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free The Key Wood</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-    <div class="main-wrapper">
-          <a href="https://mastersabba.github.io/MasterSabba/" target="_self" style="position: fixed; top: 10px; left: 10px; z-index: 9999; text-decoration: none; color: rgba(255, 255, 255, 0.2); font-family: sans-serif; font-size: 24px; padding: 10px; transition: color 0.3s ease;">✕</a>
-        <h1>Free The Key</h1> <div class="stats">
-            <p>Livello: <span id="level">1</span></p>
-            <p>Mosse: <span id="moves">0</span></p>
-            <p>Tempo: <span id="timer">00:00</span></p>
+    <div class="game-container">
+        <a href="https://mastersabba.github.io/MasterSabba/" class="back-home">✕</a>
+        <h1>Free The Key</h1>
+        
+        <div class="info-bar">
+            <span>Livello: <b id="level">1</b></span>
+            <span>Mosse: <b id="moves">0</b></span>
+            <span>Tempo: <b id="timer">00:00</b></span>
         </div>
 
         <div class="board-frame">
             <div id="grid" class="grid"></div>
         </div>
 
-        <div class="controls">
-            <button onclick="resetLevel()">Reset</button> <button class="hint-btn" onclick="useHint()">💡 Hint</button> </div>
+        <div class="button-group">
+            <button onclick="resetLevel()">Reset</button>
+            <button class="hint-btn" onclick="useHint()">💡 Hint</button>
+        </div>
     </div>
-
-    <script src="game.js"></script> </body>
+    <script src="game.js"></script>
+</body>
 </html>
