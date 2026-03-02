@@ -1,159 +1,156 @@
-const cellSize = 50;
-let grid, levelDisp, movesDisp, xpDisp, timerDisp;
+// --- CONFIGURAZIONE ---
+const TOTAL_LEVELS = 100;
+const LEVELS_PER_PAGE = 20; // 5 righe x 4 colonne come in foto
+const STORAGE_KEY = 'masterKey_levelProgress'; // Chiave per il salvataggio in locale
 
-let level = parseInt(localStorage.getItem('mk_level')) || 1;
-let xp = parseInt(localStorage.getItem('mk_xp')) || 0;
-let moves = 0;
-let seconds = 0;
-let timerInterval;
-let blocks = [];
-let initialPos = [];
-let isDragging = false; // Impedisce di muovere due pezzi insieme
+// --- VARIABILI DI STATO ---
+let currentLevel = 1; // Il livello che l'utente sta giocando
+let unlockedLevels = parseInt(localStorage.getItem(STORAGE_KEY)) || 1; // Livello massimo sbloccato
+let currentSelectionPage = 0; // Pagina corrente nella schermata di selezione
 
+// --- ELEMENTI DOM (HTML) ---
+let gameInterface;
+let levelSelectionInterface;
+let levelGrid;
+let currentLevelDisplay;
+let prevPageBtn;
+let nextPageBtn;
+let pageIndicator;
+let backToSelectionBtn;
+let completeLevelBtn; // Un pulsante temporaneo nel gioco per testare lo sblocco
+
+// --- INIZIALIZZAZIONE ---
 window.addEventListener('DOMContentLoaded', () => {
-    grid = document.getElementById("grid");
-    levelDisp = document.getElementById("level");
-    xpDisp = document.getElementById("xp");
-    movesDisp = document.getElementById("moves");
-    timerDisp = document.getElementById("timer");
-    generateLevel();
+    // Collega gli elementi DOM
+    gameInterface = document.getElementById("game-interface");
+    levelSelectionInterface = document.getElementById("level-selection-interface");
+    levelGrid = document.getElementById("level-grid");
+    currentLevelDisplay = document.getElementById("current-level-display");
+    prevPageBtn = document.getElementById("prev-page");
+    nextPageBtn = document.getElementById("next-page");
+    pageIndicator = document.getElementById("page-indicator");
+    backToSelectionBtn = document.getElementById("back-to-selection");
+    completeLevelBtn = document.getElementById("complete-level-btn"); // Pulsante di test
+
+    // Aggiungi listener per i pulsanti di navigazione
+    prevPageBtn.addEventListener('click', () => changePage(-1));
+    nextPageBtn.addEventListener('click', () => changePage(1));
+    backToSelectionBtn.addEventListener('click', showLevelSelection);
+    
+    // Pulsante temporaneo per simulare il completamento di un livello
+    completeLevelBtn.addEventListener('click', simulateLevelCompletion);
+
+    // Inizialmente mostra la selezione livelli
+    showLevelSelection();
 });
 
-function generateLevel() {
-    blocks = [{ x: 0, y: 2, l: 2, o: 'h', k: true }];
-    let count = 4 + Math.min(level, 6);
-    for (let i = 0; i < count; i++) {
-        let attempts = 0;
-        while (attempts < 50) {
-            attempts++;
-            let l = Math.random() > 0.7 ? 3 : 2;
-            let o = Math.random() > 0.5 ? 'h' : 'v';
-            let x = Math.floor(Math.random() * (6 - (o === 'h' ? l : 1)));
-            let y = Math.floor(Math.random() * (6 - (o === 'v' ? l : 1)));
-            if (o === 'h' && y === 2) continue;
-            if (!checkCollision(x, y, l, o, -1)) {
-                blocks.push({ x, y, l, o, k: false });
-                break;
-            }
+// --- FUNZIONI DI INTERFACCIA ---
+
+// Mostra la schermata di selezione livelli e nasconde il gioco
+function showLevelSelection() {
+    gameInterface.style.display = "none";
+    levelSelectionInterface.style.display = "flex";
+    backToSelectionBtn.style.display = "none"; // Nascondi il tasto "indietro" mentre sei nella selezione
+    renderLevelGrid();
+    updateNavigationButtons();
+}
+
+// Mostra la schermata di gioco e nasconde la selezione livelli
+function loadLevel(levelNumber) {
+    if (levelNumber > unlockedLevels) return; // Non caricare se bloccato
+
+    currentLevel = levelNumber;
+    gameInterface.style.display = "flex";
+    levelSelectionInterface.style.display = "none";
+    backToSelectionBtn.style.display = "block"; // Mostra il tasto per tornare indietro
+    
+    // Aggiorna la visualizzazione del livello corrente nel gioco
+    currentLevelDisplay.innerText = currentLevel;
+
+    // --- QUI ANDREBBE IL TUO CODICE PER INIZIALIZZARE IL LIVELLO CORRENTE ---
+    console.log(`Caricamento del livello ${currentLevel}...`);
+    // Esempio: generateBlocksForLevel(currentLevel);
+}
+
+// --- LOGICA DI SELEZIONE LIVELLI ---
+
+// Genera dinamicamente la griglia di pulsanti per i livelli
+function renderLevelGrid() {
+    levelGrid.innerHTML = ''; // Svuota la griglia
+
+    const startIndex = currentSelectionPage * LEVELS_PER_PAGE;
+    const endIndex = Math.min(startIndex + LEVELS_PER_PAGE, TOTAL_LEVELS);
+
+    for (let i = startIndex; i < endIndex; i++) {
+        const levelNumber = i + 1;
+        const levelEl = document.createElement("div");
+        
+        // Determina la classe in base allo stato
+        if (levelNumber < unlockedLevels) {
+            levelEl.className = "level-item completed"; // Già svolto (rifabile)
+            levelEl.innerText = levelNumber;
+        } else if (levelNumber === unlockedLevels) {
+            levelEl.className = "level-item current"; // Livello corrente da svolgere
+            levelEl.innerText = levelNumber;
+        } else {
+            levelEl.className = "level-item locked"; // Bloccato
+            // Aggiungi icona lucchetto (puoi usare un'immagine o un carattere speciale)
+            const lockIcon = document.createElement("span");
+            lockIcon.innerHTML = "&#128274;"; // Lucchetto (🔒)
+            levelEl.appendChild(lockIcon);
         }
+
+        // Aggiungi listener per il click
+        levelEl.addEventListener('click', () => loadLevel(levelNumber));
+        
+        levelGrid.appendChild(levelEl);
     }
-    initialPos = JSON.parse(JSON.stringify(blocks)); 
-    moves = 0;
-    updateUI();
-    startTimer();
-    render();
+
+    // Aggiorna l'indicatore di pagina
+    pageIndicator.innerText = `${currentSelectionPage + 1} / ${Math.ceil(TOTAL_LEVELS / LEVELS_PER_PAGE)}`;
 }
 
-function checkCollision(x, y, l, o, ignoreIdx) {
-    const w = o === 'h' ? l : 1;
-    const h = o === 'v' ? l : 1;
-    if (x < 0 || x + w > 6 || y < 0 || y + h > 6) return true;
-    return blocks.some((b, i) => {
-        if (i === ignoreIdx) return false;
-        const bw = b.o === 'h' ? b.l : 1;
-        const bh = b.o === 'v' ? b.l : 1;
-        return x < b.x + bw && x + w > b.x && y < b.y + bh && y + h > b.y;
-    });
-}
+// Gestisce il cambio pagina
+function changePage(direction) {
+    const totalPages = Math.ceil(TOTAL_LEVELS / LEVELS_PER_PAGE);
+    const nextPage = currentSelectionPage + direction;
 
-function render() {
-    if (!grid) return;
-    grid.innerHTML = '';
-    blocks.forEach((b, i) => {
-        const div = document.createElement("div");
-        div.className = `block ${b.k ? 'block-key' : ''}`;
-        div.style.width = (b.o === 'h' ? b.l * cellSize : cellSize) - 6 + "px";
-        div.style.height = (b.o === 'v' ? b.l * cellSize : cellSize) - 6 + "px";
-        div.style.left = (b.x * cellSize + 3) + "px";
-        div.style.top = (b.y * cellSize + 3) + "px";
-
-        div.onpointerdown = (e) => {
-            if (isDragging) return; // Se sto già trascinando, ignora altri tocchi
-            isDragging = true;
-            
-            div.setPointerCapture(e.pointerId);
-            let startX = e.clientX;
-            let startY = e.clientY;
-            let origX = b.x;
-            let origY = b.y;
-
-            div.onpointermove = (em) => {
-                let dx = Math.round((em.clientX - startX) / cellSize);
-                let dy = Math.round((em.clientY - startY) / cellSize);
-                
-                let targetPos = (b.o === 'h' ? origX + dx : origY + dy);
-                let currentPos = (b.o === 'h' ? b.x : b.y);
-                
-                // Muovi il blocco un passo alla volta per controllare le collisioni nel mezzo
-                while (currentPos !== targetPos) {
-                    let step = targetPos > currentPos ? 1 : -1;
-                    let nextX = b.x + (b.o === 'h' ? step : 0);
-                    let nextY = b.y + (b.o === 'v' ? step : 0);
-                    
-                    if (!checkCollision(nextX, nextY, b.l, b.o, i)) {
-                        b.x = nextX;
-                        b.y = nextY;
-                        currentPos += step;
-                        moves++;
-                        updateUI();
-                    } else {
-                        break; // Stop se c'è un ostacolo
-                    }
-                }
-                
-                div.style.left = (b.x * cellSize + 3) + "px";
-                div.style.top = (b.y * cellSize + 3) + "px";
-            };
-            
-            div.onpointerup = () => {
-                div.onpointermove = null;
-                isDragging = false;
-                if (b.k && b.x >= 4) {
-                    alert("Ottimo! Livello superato.");
-                    level++; xp += 100;
-                    saveData();
-                    generateLevel();
-                }
-            };
-        };
-        grid.appendChild(div);
-    });
-}
-
-function updateUI() {
-    if(levelDisp) levelDisp.innerText = level;
-    if(xpDisp) xpDisp.innerText = xp;
-    if(movesDisp) movesDisp.innerText = moves;
-}
-
-function startTimer() {
-    clearInterval(timerInterval);
-    seconds = 0;
-    timerInterval = setInterval(() => {
-        seconds++;
-        let m = Math.floor(seconds / 60).toString().padStart(2, '0');
-        let s = (seconds % 60).toString().padStart(2, '0');
-        if(timerDisp) timerDisp.innerText = `${m}:${s}`;
-    }, 1000);
-}
-
-function saveData() {
-    localStorage.setItem('mk_level', level);
-    localStorage.setItem('mk_xp', xp);
-}
-
-function resetLevel() {
-    blocks = JSON.parse(JSON.stringify(initialPos));
-    moves = 0;
-    isDragging = false;
-    updateUI();
-    render();
-}
-
-function useHint() {
-    const key = document.querySelector('.block-key');
-    if(key) {
-        key.style.filter = "brightness(1.5)";
-        setTimeout(() => key.style.filter = "none", 500);
+    if (nextPage >= 0 && nextPage < totalPages) {
+        currentSelectionPage = nextPage;
+        renderLevelGrid();
+        updateNavigationButtons();
     }
+}
+
+// Abilita/disabilita i pulsanti di navigazione
+function updateNavigationButtons() {
+    const totalPages = Math.ceil(TOTAL_LEVELS / LEVELS_PER_PAGE);
+    prevPageBtn.disabled = (currentSelectionPage === 0);
+    nextPageBtn.disabled = (currentSelectionPage === totalPages - 1);
+}
+
+// --- LOGICA DI SALVATAGGIO PROGRESSI ---
+
+// Salva il livello massimo sbloccato nel localStorage
+function saveProgress() {
+    localStorage.setItem(STORAGE_KEY, unlockedLevels);
+}
+
+// Simula il completamento del livello corrente (da chiamare quando il puzzle è risolto)
+function simulateLevelCompletion() {
+    console.log(`Livello ${currentLevel} completato!`);
+
+    // Se abbiamo completato il livello corrente "massimo", sblocchiamo il successivo
+    if (currentLevel === unlockedLevels && unlockedLevels < TOTAL_LEVELS) {
+        unlockedLevels++;
+        saveProgress();
+        console.log(`Nuovo livello sbloccato: ${unlockedLevels}`);
+    } else if (currentLevel < unlockedLevels) {
+        console.log("Livello già completato in precedenza, nessun nuovo sblocco.");
+    } else if (currentLevel === TOTAL_LEVELS) {
+        console.log("Gioco completato! Congratulazioni!");
+    }
+
+    // Dopo il completamento, torna alla selezione livelli
+    setTimeout(showLevelSelection, 1000); // Piccolo ritardo per feedback
 }
