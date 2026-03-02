@@ -1,7 +1,7 @@
 const cellSize = 50;
 let grid, levelDisp, movesDisp, xpDisp, timerDisp;
 
-// Recupero dati da LocalStorage (come da tua richiesta)
+// Recupero dati salvati
 let level = parseInt(localStorage.getItem('mk_level')) || 1;
 let xp = parseInt(localStorage.getItem('mk_xp')) || 0;
 let moves = 0;
@@ -10,25 +10,22 @@ let timerInterval;
 let blocks = [];
 let initialPos = [];
 
-// Aspetta il caricamento completo del DOM
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
+    // Collegamento elementi HTML
     grid = document.getElementById("grid");
     levelDisp = document.getElementById("level");
     xpDisp = document.getElementById("xp");
     movesDisp = document.getElementById("moves");
     timerDisp = document.getElementById("timer");
 
-    // Piccolo delay per caricare i CSS correttamente
-    setTimeout(() => {
-        generateLevel();
-    }, 100);
+    generateLevel();
 });
 
 function generateLevel() {
-    // 1. Definiamo la chiave d'oro
+    // La chiave d'oro (sempre sulla riga 2)
     blocks = [{ x: 0, y: 2, l: 2, o: 'h', k: true }];
     
-    // 2. Aggiungiamo blocchi casuali
+    // Aggiungi ostacoli (difficoltà crescente)
     let count = 4 + Math.min(level, 6);
     for (let i = 0; i < count; i++) {
         let attempts = 0;
@@ -39,7 +36,7 @@ function generateLevel() {
             let x = Math.floor(Math.random() * (6 - (o === 'h' ? l : 1)));
             let y = Math.floor(Math.random() * (6 - (o === 'v' ? l : 1)));
 
-            // Non bloccare la riga 2 (quella della chiave) con blocchi orizzontali
+            // Non bloccare la riga della chiave con pezzi orizzontali
             if (o === 'h' && y === 2) continue;
 
             if (!checkCollision(x, y, l, o, -1)) {
@@ -53,7 +50,7 @@ function generateLevel() {
     moves = 0;
     updateUI();
     startTimer();
-    render(); // <--- Questa è la funzione che crea i div dei blocchi
+    render();
 }
 
 function checkCollision(x, y, l, o, ignoreIdx) {
@@ -70,32 +67,18 @@ function checkCollision(x, y, l, o, ignoreIdx) {
 }
 
 function render() {
-    if (!grid) {
-        console.error("Griglia non trovata!");
-        return;
-    }
-    
-    // Svuota i vecchi blocchi ma lascia l'eventuale uscita
+    if (!grid) return;
     grid.innerHTML = '';
     
     blocks.forEach((b, i) => {
         const div = document.createElement("div");
         div.className = `block ${b.k ? 'block-key' : ''}`;
         
-        // Dimensioni (sottraiamo 6 per il bordo)
-        const w = (b.o === 'h' ? b.l * cellSize : cellSize) - 6;
-        const h = (b.o === 'v' ? b.l * cellSize : cellSize) - 6;
-        
-        div.style.width = w + "px";
-        div.style.height = h + "px";
+        div.style.width = (b.o === 'h' ? b.l * cellSize : cellSize) - 6 + "px";
+        div.style.height = (b.o === 'v' ? b.l * cellSize : cellSize) - 6 + "px";
         div.style.left = (b.x * cellSize + 3) + "px";
         div.style.top = (b.y * cellSize + 3) + "px";
-        
-        // Assicurati che siano visibili
-        div.style.display = "block";
-        div.style.opacity = "1";
 
-        // Gestione movimento
         div.onpointerdown = (e) => {
             div.setPointerCapture(e.pointerId);
             let startX = e.clientX;
@@ -104,22 +87,18 @@ function render() {
             let origY = b.y;
 
             div.onpointermove = (em) => {
-                let dx = em.clientX - startX;
-                let dy = em.clientY - startY;
-                let move = Math.round((b.o === 'h' ? dx : dy) / cellSize);
+                let dx = Math.round((em.clientX - startX) / cellSize);
+                let dy = Math.round((em.clientY - startY) / cellSize);
+                let nx = origX + (b.o === 'h' ? dx : 0);
+                let ny = origY + (b.o === 'v' ? dy : 0);
 
-                if (move !== 0) {
-                    let nx = origX + (b.o === 'h' ? move : 0);
-                    let ny = origY + (b.o === 'v' ? move : 0);
-
-                    if (!checkCollision(nx, ny, b.l, b.o, i)) {
-                        if(b.x !== nx || b.y !== ny) {
-                            b.x = nx; b.y = ny;
-                            moves++;
-                            updateUI();
-                            div.style.left = (b.x * cellSize + 3) + "px";
-                            div.style.top = (b.y * cellSize + 3) + "px";
-                        }
+                if (!checkCollision(nx, ny, b.l, b.o, i)) {
+                    if (b.x !== nx || b.y !== ny) {
+                        b.x = nx; b.y = ny;
+                        moves++;
+                        updateUI();
+                        div.style.left = (b.x * cellSize + 3) + "px";
+                        div.style.top = (b.y * cellSize + 3) + "px";
                     }
                 }
             };
@@ -127,7 +106,7 @@ function render() {
             div.onpointerup = () => {
                 div.onpointermove = null;
                 if (b.k && b.x >= 4) {
-                    alert("Livello Completato!");
+                    alert("Ottimo! Livello superato.");
                     level++; xp += 100;
                     saveData();
                     generateLevel();
@@ -165,4 +144,12 @@ function resetLevel() {
     moves = 0;
     updateUI();
     render();
+}
+
+function useHint() {
+    const key = document.querySelector('.block-key');
+    if(key) {
+        key.style.filter = "brightness(1.5)";
+        setTimeout(() => key.style.filter = "none", 500);
+    }
 }
