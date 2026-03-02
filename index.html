@@ -2,30 +2,43 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free The Key: Wood Edition</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
-    <a href="https://mastersabba.github.io/MasterSabba/" class="back-link">✕</a>
+    
+    <button id="back-to-selection" class="back-link">&#x2715;</button>
 
-    <div class="game-container">
-        <h1>Free The Key</h1>
-        <div class="stats">
-            <p>Livello: <span id="level">1</span></p>
-            <p>XP: <span id="xp">0</span></p>
-            <p>Mosse: <span id="moves">0</span></p>
-        </div>
+    <div id="level-selection-interface" class="interface selection-active">
+        <h1>Seleziona Livello</h1>
+        
+        <div id="level-grid" class="level-grid">
+            </div>
 
-        <div class="board-frame">
-            <div id="grid" class="grid"></div>
-        </div>
-
-        <div class="controls">
-            <button class="btn-wood" onclick="resetLevel()">Reset</button>
+        <div class="selection-controls">
+            <button id="prev-page" class="nav-btn">&lt;</button>
+            <span id="page-indicator">1 / 5</span>
+            <button id="next-page" class="nav-btn">&gt;</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <div id="game-interface" class="interface" style="display: none;">
+        <div class="game-container">
+            <h1>Livello <span id="current-level-display">1</span></h1>
+            
+            <div class="board-frame">
+                <div id="grid" class="grid">
+                    </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn-wood" onclick="resetLevel()">Reset</button> 
+                <button id="complete-level-btn" class="btn-wood btn-complete">Completa (Test)</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script> 
 </body>
 </html>
