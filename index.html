@@ -1,25 +1,25 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free The Key: Wood Edition</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<link rel="stylesheet" href="style.css">
+
     <a href="https://mastersabba.github.io/MasterSabba/" class="back-link">✕</a>
+
     <div class="game-container">
         <h1>Free The Key</h1>
+
         <div class="stats">
-            <span>Livello: <span id="level">1</span></span>
-            <span>XP: <span id="xp">0</span></span>
-            <span>Mosse: <span id="moves">0</span></span>
+            <p>Livello: <span id="level">1</span></p>
+            <p>XP: <span id="xp">0</span></p>
+            <p>Mosse: <span id="moves">0</span></p>
+            <p>Tempo: <span id="timer">00:00</span></p>
         </div>
+
         <div class="board-frame">
             <div id="grid" class="grid"></div>
         </div>
-        <button class="btn-wood" onclick="resetLevel()">Reset</button>
+
+        <div class="controls">
+            <button class="btn-wood" onclick="resetLevel()">Reset</button>
+            <button class="btn-wood btn-hint" onclick="useHint()">💡 Hint</button>
+        </div>
     </div>
+
     <script src="game.js"></script>
-</body>
-</html>
