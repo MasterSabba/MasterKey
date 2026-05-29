@@ -14,7 +14,6 @@ Il gioco include:
 - Menu livelli con sblocco progressivo
 - Victory screen con ricompense
 
-Il gioco fa parte della collection MasterHub:
-https://mastersabba.github.io/MasterSabba/
+È collegato alla repository centrale MasterGames (https://mastersabba.github.io/MasterSabba/), che contiene tutti i minigiochi della serie Master.
 
 ![Immagine](IMG_9432.jpeg)
