@@ -91,7 +91,7 @@ function canMoveTo(x, y, l, o, idx, currentBlocks) {
     });
 }
 
-// --- MENU E NAVIGAZIONE (FIXED) ---
+// --- MENU E NAVIGAZIONE ---
 function toggleMenu() {
     const m = document.getElementById("level-menu");
     const s = document.getElementById("skin-shop");
@@ -266,9 +266,14 @@ function startTimer() {
     }, 1000);
 }
 function resetTimer() { clearInterval(timerInterval); seconds = 0; document.getElementById("timer").innerText = "00:00"; }
+
 function updateUI() { 
     document.getElementById("xp").innerText = xp; 
     document.getElementById("level").innerText = level; 
+    
+    // --- SALVATAGGIO AUTOMATICO DEI PUNTI PER L'HUB ---
+    localStorage.setItem("points_masterklotski", xp);
 }
+
 function resetLevel() { blocks = JSON.parse(JSON.stringify(initialPos)); render(); resetTimer(); startTimer(); }
 function nextLevel() { loadLevel(level + 1); }
