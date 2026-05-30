@@ -3,7 +3,7 @@ let blocks = [], initialPos = [], isDragging = false, timerInterval, seconds = 0
 
 let level = parseInt(localStorage.getItem('mk_level')) || 1;
 let unlockedLevel = parseInt(localStorage.getItem('mk_unlocked')) || 1;
-let xp = parseInt(localStorage.getItem('mk_xp')) || 0;
+let xp = parseInt(localStorage.getItem("points_masterklotski")) || 0;
 let rewardedLevels = JSON.parse(localStorage.getItem('mk_rewarded')) || [];
 let ownedSkins = JSON.parse(localStorage.getItem('mk_skins')) || ['default'];
 let currentSkin = localStorage.getItem('mk_currentSkin') || 'default';
