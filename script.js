@@ -272,7 +272,7 @@ function updateUI() {
     document.getElementById("level").innerText = level; 
     
     // --- SALVATAGGIO AUTOMATICO DEI PUNTI PER L'HUB ---
-    localStorage.setItem("points_masterklotski", xp);
+    localStorage.setItem("points_masterkey", xp);
 }
 
 function resetLevel() { blocks = JSON.parse(JSON.stringify(initialPos)); render(); resetTimer(); startTimer(); }
