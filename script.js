@@ -3,10 +3,17 @@ let blocks = [], initialPos = [], isDragging = false, timerInterval, seconds = 0
 
 let level = parseInt(localStorage.getItem('mk_level')) || 1;
 let unlockedLevel = parseInt(localStorage.getItem('mk_unlocked')) || 1;
-let xp = parseInt(localStorage.getItem("points_masterkey")) || parseInt(localStorage.getItem("mk_xp")) || 0;
+
+// Sincronizzazione con il formato chiave standard dell'Hub (points_masterkey)
+let xp = parseInt(localStorage.getItem("points_masterkey")) || parseInt(localStorage.getItem('mk_xp')) || 0;
+localStorage.setItem('points_masterkey', xp);
+
 let rewardedLevels = JSON.parse(localStorage.getItem('mk_rewarded')) || [];
 let ownedSkins = JSON.parse(localStorage.getItem('mk_skins')) || ['default'];
 let currentSkin = localStorage.getItem('mk_currentSkin') || 'default';
+
+// Gestione Nickname per Firebase
+let userNick = localStorage.getItem('nickname') || localStorage.getItem('username') || localStorage.getItem('mk_nick') || "Player";
 
 // Elenco skin disponibili
 const availableSkins = [
@@ -23,6 +30,23 @@ window.onload = () => {
     loadLevel(level);
     setupSkinShop(); // Inizializza lo shop all'avvio
 };
+
+// --- SINCRONIZZAZIONE FIRESTORE ---
+async function savePoints(newXp) {
+    xp = newXp;
+    localStorage.setItem('points_masterkey', xp);
+    localStorage.setItem('mk_xp', xp);
+    updateUI();
+
+    try {
+        await db.collection("users").doc(userNick).set({
+            MasterKey: xp
+        }, { merge: true });
+        console.log("Punti MasterKey sincronizzati su Firestore per: " + userNick);
+    } catch (e) {
+        console.error("Errore di scrittura database: ", e);
+    }
+}
 
 // --- GENERATORE E RISOLUTORE (Garantisce che il livello sia fattibile) ---
 function generateHardLevel(num) {
@@ -157,12 +181,11 @@ function buySkin(id, cost) {
         return;
     }
     if (xp >= cost) {
-        xp -= cost;
+        let newXp = xp - cost;
         ownedSkins.push(id);
-        localStorage.setItem('mk_xp', xp);
         localStorage.setItem('mk_skins', JSON.stringify(ownedSkins));
         applySkin(id);
-        updateUI();
+        savePoints(newXp);
         setupSkinShop();
         alert("Skin sbloccata!");
     } else {
@@ -245,9 +268,10 @@ function handleWin() {
     setTimeout(() => {
         let msg = "GIÀ FATTO";
         if (!rewardedLevels.includes(level)) {
-            xp += 100; rewardedLevels.push(level);
+            let newXp = xp + 100;
+            rewardedLevels.push(level);
             localStorage.setItem('mk_rewarded', JSON.stringify(rewardedLevels));
-            localStorage.setItem('mk_xp', xp);
+            savePoints(newXp);
             msg = "+100 💎";
         }
         if (level === unlockedLevel) { unlockedLevel++; localStorage.setItem('mk_unlocked', unlockedLevel); }
