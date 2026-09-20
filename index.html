@@ -4,10 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Master Key - Pro Edition</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --bg: #120a05;
+            --wood: #9b6b3d;
+            --wood-dark: #3d2616;
+            --gold: #ffd700;
+        }
+
+        body {
+            margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center;
+            background: var(--bg); color: #f0e6d2; font-family: sans-serif; overflow: hidden; touch-action: none;
+            transition: background 0.5s;
+        }
+
+        /* SKIN VARIATIONS */
+        body.skin-neon { --bg: #000510; --wood: #00d4ff; --wood-dark: #001a33; --gold: #00ffcc; }
+        body.skin-royal { --bg: #1a001a; --wood: #9b30ff; --wood-dark: #330033; --gold: #ffd700; }
+        body.skin-gold { --bg: #1a1500; --wood: #d4af37; --wood-dark: #3a2e00; --gold: #ffffff; }
+        body.skin-lava { --bg: #1a0500; --wood: #ff4500; --wood-dark: #330000; --gold: #ffcc00; }
+        body.skin-aqua { --bg: #001a1a; --wood: #00ffff; --wood-dark: #003333; --gold: #7fffd4; }
+
+        .exit-btn {
+            position: fixed; top: 10px; left: 10px; z-index: 9999; text-decoration: none; 
+            color: rgba(255, 255, 255, 0.4); font-family: sans-serif; font-size: 26px; padding: 10px; transition: color 0.3s ease;
+        }
+        .exit-btn:hover { color: #fff; }
+
+        #game-ui { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .header { display: flex; gap: 20px; background: var(--wood-dark); padding: 10px 20px; border-radius: 15px; border: 2px solid var(--wood); }
+        .stat-item { font-weight: bold; color: var(--gold); }
+        .btn-menu-top { background: var(--gold); border: none; font-weight: bold; border-radius: 5px; cursor: pointer; padding: 5px 10px; }
+        .level-tag { color: var(--gold); font-weight: bold; font-size: 1.2rem; }
+
+        .board-frame { padding: 12px; background: var(--wood-dark); border-radius: 15px; border: 4px solid #000; box-shadow: 0 10px 30px #000; }
+        .grid { width: 300px; height: 300px; position: relative; background: #000; border-radius: 8px; }
+
+        .grid::after {
+            content: ''; position: absolute; right: -18px; top: 100px; width: 20px; height: 50px; 
+            background: var(--gold); border-radius: 0 8px 8px 0; box-shadow: 0 0 15px var(--gold);
+        }
+
+        .block {
+            position: absolute; border-radius: 8px; box-sizing: border-box; border: 2px solid rgba(0,0,0,0.3);
+            background: var(--wood); cursor: grab; box-shadow: inset 0 0 10px rgba(255,255,255,0.2);
+            touch-action: none;
+        }
+        .block-key { background: var(--gold); z-index: 10; border-color: #fff; }
+
+        .btn-wood {
+            margin: 5px; padding: 12px 20px; background: var(--wood-dark); color: white; border: 1px solid var(--wood);
+            border-radius: 8px; font-weight: bold; cursor: pointer;
+        }
+        .btn-wood.gold { background: var(--gold); color: #000; }
+        .btn-wood.skin { background: #000; color: var(--gold); border: 1px solid var(--gold); }
+
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; }
+        .modal { background: var(--wood-dark); padding: 25px; border-radius: 20px; border: 3px solid var(--wood); text-align: center; width: 85%; max-width: 320px; }
+
+        .level-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; max-height: 250px; overflow-y: auto; }
+        .lvl-btn { aspect-ratio: 1; background: #000; color: var(--gold); border: 2px solid var(--wood); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .lvl-btn.locked { opacity: 0.3; cursor: not-allowed; }
+        .lvl-btn.completed { border-color: var(--gold); background: rgba(255, 215, 0, 0.1); }
+
+        .skin-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; max-height: 260px; overflow-y: auto; }
+        .skin-item { padding: 12px; border: 2px solid var(--wood); background: #000; color: white; border-radius: 10px; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+    </style>
 </head>
 <body class="skin-default">
-    <a href="https://mastersabba.github.io/MasterSabba/" target="_self" style="position: fixed; top: 10px; left: 10px; z-index: 9999; text-decoration: none; color: rgba(255, 255, 255, 0.2); font-family: sans-serif; font-size: 24px; padding: 10px; transition: color 0.3s ease;">✕</a>
+    <a href="https://mastersabba.github.io/MasterSabba/" target="_self" class="exit-btn">✕</a>
+    
     <div id="game-ui">
         <div class="header">
             <div class="stat-item">⏳ <span id="timer">00:00</span></div>
@@ -38,11 +104,7 @@
     <div id="skin-shop" class="overlay">
         <div class="modal">
             <h2>CAMBIA SKIN</h2>
-            <div class="skin-options">
-                <button class="skin-item" onclick="applySkin('default')">Legno (Free)</button>
-                <button class="skin-item" onclick="buySkin('neon', 1000)">Neon Blue (1000 💎)</button>
-                <button class="skin-item" onclick="buySkin('royal', 2500)">Royal Gold (2500 💎)</button>
-            </div>
+            <div id="skin-grid" class="skin-options"></div>
             <button class="btn-wood" onclick="toggleSkinShop()">CHIUDI</button>
         </div>
     </div>
@@ -58,6 +120,299 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        const cellSize = 50;
+        let blocks = [], initialPos = [], isDragging = false, timerInterval, seconds = 0;
+
+        let level = parseInt(localStorage.getItem('mk_level')) || 1;
+        let unlockedLevel = parseInt(localStorage.getItem('mk_unlocked')) || 1;
+
+        let xp = parseInt(localStorage.getItem("points_masterkey")) || parseInt(localStorage.getItem('mk_xp')) || 0;
+        localStorage.setItem('points_masterkey', xp);
+
+        let rewardedLevels = JSON.parse(localStorage.getItem('mk_rewarded')) || [];
+        let ownedSkins = JSON.parse(localStorage.getItem('mk_skins')) || ['default'];
+        let currentSkin = localStorage.getItem('mk_currentSkin') || 'default';
+
+        let userNick = localStorage.getItem('nickname') || localStorage.getItem('username') || localStorage.getItem('mk_nick') || "Player";
+
+        const availableSkins = [
+            { id: 'default', name: 'Legno', cost: 0 },
+            { id: 'neon', name: 'Neon City', cost: 500 },
+            { id: 'royal', name: 'Royal Gold', cost: 1500 },
+            { id: 'lava', name: 'Magma', cost: 2500 },
+            { id: 'aqua', name: 'Oceano', cost: 3000 }
+        ];
+
+        window.onload = () => {
+            applySkin(currentSkin);
+            updateUI();
+            loadLevel(level);
+            setupSkinShop();
+        };
+
+        async function savePoints(newXp) {
+            xp = newXp;
+            localStorage.setItem('points_masterkey', xp);
+            localStorage.setItem('mk_xp', xp);
+            updateUI();
+
+            try {
+                if (typeof db !== 'undefined') {
+                    await db.collection("users").doc(userNick).set({ MasterKey: xp }, { merge: true });
+                }
+            } catch (e) {
+                console.error("Errore salvataggio Cloud:", e);
+            }
+        }
+
+        function triggerGameWin(pointsGained) {
+            const winMsg = { type: 'GAME_WIN', gameKey: 'master-key', points: pointsGained };
+            if (window.opener) window.opener.postMessage(winMsg, '*');
+            if (window.parent && window.parent !== window) window.parent.postMessage(winMsg, '*');
+        }
+
+        function generateHardLevel(num) {
+            let solved = false;
+            let attempts = 0;
+            let seed = num * 1234.5;
+            const rng = () => {
+                seed = Math.sin(seed) * 10000;
+                return seed - Math.floor(seed);
+            };
+
+            while (!solved && attempts < 50) {
+                attempts++;
+                blocks = [{ x: 0, y: 2, l: 2, o: 'h', k: true }];
+                let targetCount = 8 + Math.min(Math.floor(num / 4), 7);
+                
+                for (let i = 0; i < 200 && blocks.length < targetCount; i++) {
+                    let l = rng() > 0.8 ? 3 : 2;
+                    let o = rng() > 0.5 ? 'h' : 'v';
+                    let x = Math.floor(rng() * (6 - (o === 'h' ? l : 1)));
+                    let y = Math.floor(rng() * (6 - (o === 'v' ? l : 1)));
+                    if (o === 'h' && y === 2) continue; 
+                    if (!checkCollision(x, y, l, o, -1)) blocks.push({ x, y, l, o, k: false });
+                }
+                if (isSolvable(JSON.parse(JSON.stringify(blocks)))) solved = true;
+                else seed += 1;
+            }
+            initialPos = JSON.parse(JSON.stringify(blocks));
+        }
+
+        function isSolvable(startBlocks) {
+            let queue = [JSON.stringify(startBlocks)];
+            let visited = new Set([queue[0]]);
+            let steps = 0;
+            while (queue.length > 0 && steps < 1200) {
+                steps++;
+                let currentBlocks = JSON.parse(queue.shift());
+                if (currentBlocks[0].x === 4) return true;
+                for (let i = 0; i < currentBlocks.length; i++) {
+                    let b = currentBlocks[i];
+                    let dirs = b.o === 'h' ? [[1,0], [-1,0]] : [[0,1], [0,-1]];
+                    for (let d of dirs) {
+                        let next = JSON.parse(JSON.stringify(currentBlocks));
+                        let nb = next[i];
+                        while (true) {
+                            let nx = nb.x + d[0], ny = nb.y + d[1];
+                            if (canMoveTo(nx, ny, nb.l, nb.o, i, next)) {
+                                nb.x = nx; nb.y = ny;
+                                let state = JSON.stringify(next);
+                                if (!visited.has(state)) { visited.add(state); queue.push(state); }
+                            } else break;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        function canMoveTo(x, y, l, o, idx, currentBlocks) {
+            const w = o === 'h' ? l : 1, h = o === 'v' ? l : 1;
+            if (x < 0 || x + w > 6 || y < 0 || y + h > 6) return false;
+            return !currentBlocks.some((b, i) => {
+                if (i === idx) return false;
+                const bw = b.o === 'h' ? b.l : 1, bh = b.o === 'v' ? b.l : 1;
+                return x < b.x + bw && x + w > b.x && y < b.y + bh && y + h > b.y;
+            });
+        }
+
+        function toggleMenu() {
+            const m = document.getElementById("level-menu");
+            const s = document.getElementById("skin-shop");
+            const v = document.getElementById("victory-screen");
+            
+            if (s) s.style.display = 'none';
+            if (v) v.style.display = 'none';
+
+            const isOpening = m.style.display !== "flex";
+            m.style.display = isOpening ? "flex" : "none";
+            
+            if (isOpening) {
+                const g = document.getElementById("level-grid");
+                g.innerHTML = '';
+                for (let i = 1; i <= 100; i++) {
+                    const btn = document.createElement("div");
+                    let locked = i > unlockedLevel;
+                    btn.className = `lvl-btn ${locked ? 'locked' : (rewardedLevels.includes(i) ? 'completed' : '')}`;
+                    btn.innerHTML = locked ? '🔒' : i;
+                    if (!locked) btn.onclick = () => loadLevel(i);
+                    g.appendChild(btn);
+                }
+            }
+        }
+
+        function goToLevelsFromVictory() { toggleMenu(); }
+
+        function setupSkinShop() {
+            const shopGrid = document.getElementById("skin-grid");
+            if (!shopGrid) return;
+            shopGrid.innerHTML = '';
+            availableSkins.forEach(skin => {
+                const item = document.createElement("div");
+                item.className = "skin-item";
+                item.innerHTML = `
+                    <span>${skin.name}</span>
+                    <button class="btn-wood gold" style="margin:0; padding: 6px 12px;" onclick="buySkin('${skin.id}', ${skin.cost})">
+                        ${ownedSkins.includes(skin.id) ? (currentSkin === skin.id ? 'USATA' : 'USA') : skin.cost + ' 💎'}
+                    </button>
+                `;
+                shopGrid.appendChild(item);
+            });
+        }
+
+        function toggleSkinShop() {
+            const s = document.getElementById('skin-shop');
+            const m = document.getElementById('level-menu');
+            if (m) m.style.display = 'none';
+            
+            const isOpening = s.style.display !== 'flex';
+            s.style.display = isOpening ? 'flex' : 'none';
+            if (isOpening) setupSkinShop();
+        }
+
+        function buySkin(id, cost) {
+            if (ownedSkins.includes(id)) {
+                applySkin(id);
+                setupSkinShop();
+                return;
+            }
+            if (xp >= cost) {
+                let newXp = xp - cost;
+                ownedSkins.push(id);
+                localStorage.setItem('mk_skins', JSON.stringify(ownedSkins));
+                applySkin(id);
+                savePoints(newXp);
+                setupSkinShop();
+            } else {
+                alert("💎 XP insufficienti!");
+            }
+        }
+
+        function applySkin(id) {
+            document.body.className = 'skin-' + id;
+            currentSkin = id;
+            localStorage.setItem('mk_currentSkin', id);
+        }
+
+        function loadLevel(num) {
+            level = num;
+            localStorage.setItem('mk_level', level);
+            document.getElementById("victory-screen").style.display = "none";
+            document.getElementById("level-menu").style.display = "none";
+            generateHardLevel(num);
+            resetTimer(); startTimer(); render(); updateUI();
+        }
+
+        function render() {
+            const grid = document.getElementById("grid");
+            grid.innerHTML = '';
+            blocks.forEach((b, i) => {
+                const div = document.createElement("div");
+                div.className = `block ${b.k ? 'block-key' : ''}`;
+                div.style.width = (b.o === 'h' ? b.l * cellSize : cellSize) - 4 + "px";
+                div.style.height = (b.o === 'v' ? b.l * cellSize : cellSize) - 4 + "px";
+                div.style.left = (b.x * cellSize + 2) + "px";
+                div.style.top = (b.y * cellSize + 2) + "px";
+
+                div.onpointerdown = (e) => {
+                    if (isDragging) return;
+                    isDragging = true;
+                    div.setPointerCapture(e.pointerId);
+                    let startX = e.clientX, startY = e.clientY, ox = b.x, oy = b.y;
+
+                    div.onpointermove = (em) => {
+                        let dx = Math.round((em.clientX - startX) / cellSize);
+                        let dy = Math.round((em.clientY - startY) / cellSize);
+                        let target = (b.o === 'h' ? ox + dx : oy + dy);
+                        let current = (b.o === 'h' ? b.x : b.y);
+
+                        while (current !== target) {
+                            let step = target > current ? 1 : -1;
+                            let nx = b.x + (b.o === 'h' ? step : 0), ny = b.y + (b.o === 'v' ? step : 0);
+                            if (!checkCollision(nx, ny, b.l, b.o, i)) {
+                                b.x = nx; b.y = ny; current += step;
+                            } else break;
+                        }
+                        div.style.left = (b.x * cellSize + 2) + "px";
+                        div.style.top = (b.y * cellSize + 2) + "px";
+                    };
+                    div.onpointerup = () => {
+                        isDragging = false; div.onpointermove = null;
+                        if (b.k && b.x === 4) handleWin();
+                    };
+                };
+                grid.appendChild(div);
+            });
+        }
+
+        function checkCollision(x, y, l, o, idx) {
+            const w = o === 'h' ? l : 1, h = o === 'v' ? l : 1;
+            if (x < 0 || x + w > 6 || y < 0 || y + h > 6) return true;
+            return blocks.some((b, i) => {
+                if (i === idx) return false;
+                const bw = b.o === 'h' ? b.l : 1, bh = b.o === 'v' ? b.l : 1;
+                return x < b.x + bw && x + w > b.x && y < b.y + bh && y + h > b.y;
+            });
+        }
+
+        function handleWin() {
+            clearInterval(timerInterval);
+            const key = document.querySelector('.block-key');
+            if (key) {
+                key.style.transition = "left 0.5s ease-in"; key.style.left = "350px";
+            }
+            setTimeout(() => {
+                let msg = "GIÀ FATTO";
+                if (!rewardedLevels.includes(level)) {
+                    let newXp = xp + 100;
+                    rewardedLevels.push(level);
+                    localStorage.setItem('mk_rewarded', JSON.stringify(rewardedLevels));
+                    savePoints(newXp);
+                    triggerGameWin(100);
+                    msg = "+100 💎";
+                }
+                if (level === unlockedLevel) { unlockedLevel++; localStorage.setItem('mk_unlocked', unlockedLevel); }
+                document.getElementById("victory-xp-msg").innerText = msg;
+                document.getElementById("victory-screen").style.display = "flex";
+                updateUI();
+            }, 500);
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                seconds++;
+                let m = Math.floor(seconds/60).toString().padStart(2,'0'), s = (seconds%60).toString().padStart(2,'0');
+                document.getElementById("timer").innerText = `${m}:${s}`;
+            }, 1000);
+        }
+
+        function resetTimer() { clearInterval(timerInterval); seconds = 0; document.getElementById("timer").innerText = "00:00"; }
+        function updateUI() { document.getElementById("xp").innerText = xp; document.getElementById("level").innerText = level; }
+        function resetLevel() { blocks = JSON.parse(JSON.stringify(initialPos)); render(); resetTimer(); startTimer(); }
+        function nextLevel() { loadLevel(level + 1); }
+    </script>
 </body>
 </html>
