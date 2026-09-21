@@ -69,10 +69,18 @@
 
         .skin-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; max-height: 260px; overflow-y: auto; }
         .skin-item { padding: 12px; border: 2px solid var(--wood); background: #000; color: white; border-radius: 10px; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+
+            .exit-button {
+            position: absolute; top: 15px; left: 20px; font-size: 2rem; line-height: 1;
+            color: var(--empty-border); text-decoration: none; z-index: 100;
+            transition: all 0.2s ease; -webkit-tap-highlight-color: transparent; font-family: Arial, sans-serif;
+        }
+        .exit-button:hover { color: var(--text-color); transform: scale(1.1); }
     </style>
 </head>
-<body class="skin-default">
-    <a href="https://mastersabba.github.io/MasterSabba/" target="_self" class="exit-btn">✕</a>
+<body class="skin-default2>
+
+    <a href="#" onclick="window.close(); return false;" class="exit-button" title="Torna all'Hub">×</a>
     
     <div id="game-ui">
         <div class="header">
