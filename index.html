@@ -78,7 +78,7 @@
         .exit-button:hover { color: var(--text-color); transform: scale(1.1); }
     </style>
 </head>
-<body class="skin-default2>
+<body class="skin-default">
 
     <a href="#" onclick="window.close(); return false;" class="exit-button" title="Torna all'Hub">×</a>
     
@@ -174,11 +174,15 @@
             }
         }
 
-        function triggerGameWin(pointsGained) {
-            const winMsg = { type: 'GAME_WIN', gameKey: 'master-key', points: pointsGained };
-            if (window.opener) window.opener.postMessage(winMsg, '*');
-            if (window.parent && window.parent !== window) window.parent.postMessage(winMsg, '*');
-        }
+       function triggerGameWin(pointsGained) {
+    const target = window.opener || (window.parent !== window ? window.parent : null);
+    if (target) {
+        target.postMessage({
+            gameKey: 'master-key',
+            points: pointsGained
+        }, '*');
+    }
+}
 
         function generateHardLevel(num) {
             let solved = false;
