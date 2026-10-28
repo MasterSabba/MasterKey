@@ -9,6 +9,11 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+    <!-- Stile dinamico per la porta d'uscita -->
+    <style id="door-style">
+        .grid::after { top: 100px; height: 50px; }
+    </style>
+
     <style>
         :root {
             --bg: #0f1710;
@@ -61,10 +66,11 @@
             --board-shadow: 0 0 25px #4cc9f0;
             background: radial-gradient(circle at 50% 50%, #1d4e89 0%, #0f2b46 60%, #011627 100%);
         }
+        /* NUOVA ESTETICA MONDO 5: DESERTO DORATO / SUNSET DUNES */
         body.world-5 {
-            --bg: #130026; --wood: #b5179e; --wood-dark: #310052; --gold: #f72585; --board-border: #b5179e;
-            --board-shadow: 0 0 25px #b5179e;
-            background: radial-gradient(circle at 50% 50%, #5c0099 0%, #310052 60%, #130026 100%);
+            --bg: #1c0c04; --wood: #d97706; --wood-dark: #271203; --gold: #fbbf24; --board-border: #b45309;
+            --board-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 25px rgba(245, 158, 11, 0.4);
+            background: radial-gradient(circle at 50% 30%, #78350f 0%, #291003 50%, #0d0401 100%);
         }
         body.world-6 {
             --bg: #0f172a; --wood: #38bdf8; --wood-dark: #1e293b; --gold: #facc15; --board-border: #38bdf8;
@@ -176,7 +182,7 @@
         .grid { width: 300px; height: 300px; position: relative; background: rgba(0, 0, 0, 0.85); border-radius: 10px; overflow: visible; }
 
         .grid::after {
-            content: ''; position: absolute; right: -18px; top: 100px; width: 20px; height: 50px; 
+            content: ''; position: absolute; right: -18px; width: 20px; 
             background: var(--gold); border-radius: 0 8px 8px 0; box-shadow: 0 0 15px var(--gold); z-index: 5;
         }
 
@@ -190,12 +196,6 @@
             box-shadow: inset 0 0 15px rgba(255,255,255,0.8), 0 0 12px var(--gold);
         }
         .block-obstacle { background: #222 !important; border-color: #ff3300 !important; cursor: not-allowed; box-shadow: inset 0 0 10px #ff0000; }
-        .block-portal { background: #818cf8 !important; border-color: #c084fc !important; cursor: not-allowed; animation: pulse 1.5s infinite alternate; }
-
-        @keyframes pulse {
-            0% { opacity: 0.6; transform: scale(0.95); }
-            100% { opacity: 1; transform: scale(1.05); }
-        }
 
         .fog-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: #000; opacity: 0.92; pointer-events: none; transition: opacity 0.3s; z-index: 8; }
 
@@ -350,7 +350,7 @@
             2: { name: "2: CRIPTA NEON", desc: "Ambiente Cyberpunk", cur: "💎" },
             3: { name: "3: VULCANO MAGMATICO", desc: "Ostacoli di Fuoco Inamovibili", cur: "💎" },
             4: { name: "4: ABISSO CRISTALLIZZATO", desc: "Fisica Scivolosa di Ghiaccio", cur: "💎" },
-            5: { name: "5: DIMENSIONE QUANTISTICA", desc: "Teletrasporto Portale Wormhole", cur: "💎" },
+            5: { name: "5: DESERTO DORATO", desc: "Dune e Oasi di Sabbia", cur: "💎" },
             6: { name: "6: LABORATORIO GRAVITAZIONALE", desc: "Inversione di Gravità sui blocchi", cur: "💎" },
             7: { name: "7: REGNO DEL CREPUSCOLO", desc: "Nebbia d'Ombra Fitta", cur: "💎" },
             8: { name: "8: CYBER MATRIX ZERO", desc: "Tempo Limite a Conto alla Rovescia", cur: "💎" },
@@ -381,6 +381,11 @@
                     this.speedX = (Math.random() - 0.5) * 0.8;
                     this.speedY = (Math.random() - 0.5) * 0.8;
                     this.color = `rgba(180, 255, 100, ${Math.random() * 0.7 + 0.2})`;
+                } else if (world === 5) {
+                    // Particelle calde/dorate per il Deserto Dorato
+                    this.speedX = (Math.random() - 0.5) * 1.2;
+                    this.speedY = -(Math.random() * 0.8 + 0.2);
+                    this.color = `rgba(251, 191, 36, ${Math.random() * 0.8 + 0.2})`;
                 } else if (world === 2) {
                     this.speedX = 0; this.speedY = -(Math.random() * 1.5 + 0.5);
                     this.color = `rgba(0, 212, 255, ${Math.random() * 0.8 + 0.2})`;
@@ -463,6 +468,14 @@
 
             cellSize = 300 / gridSize;
 
+            // POSIZIONE DINAMICA PORTA D'USCITA (Allineata perfettamente alla chiave)
+            const doorStyle = document.getElementById('door-style');
+            if (doorStyle) {
+                const keyY = worldNum === 10 ? Math.floor(gridSize / 2) : 2;
+                let topPos = keyY * cellSize;
+                doorStyle.innerHTML = `.grid::after { top: ${topPos}px !important; height: ${cellSize}px !important; }`;
+            }
+
             const fogEl = document.getElementById("fog");
             if (fogEl) fogEl.style.display = (worldNum === 7) ? "block" : "none";
 
@@ -506,15 +519,13 @@
 
             const keyY = curWorld === 10 ? Math.floor(gridSize / 2) : 2;
 
-            while (!solved && attempts < 100) {
+            while (!solved && attempts < 200) {
                 attempts++;
-                blocks = [{ x: 0, y: keyY, l: 2, o: 'h', k: true, obs: false, port: false }];
+                blocks = [{ x: 0, y: keyY, l: 2, o: 'h', k: true, obs: false }];
 
                 if (curWorld === 3) {
                     let ox = Math.floor(gridSize / 2), oy = (keyY + 1) % gridSize;
-                    blocks.push({ x: ox, y: oy, l: 1, o: 'h', k: false, obs: true, port: false });
-                } else if (curWorld === 5) {
-                    blocks.push({ x: Math.floor(gridSize / 2), y: keyY, l: 1, o: 'h', k: false, obs: false, port: true });
+                    blocks.push({ x: ox, y: oy, l: 1, o: 'h', k: false, obs: true });
                 }
 
                 let targetCount = curWorld === 10 ? 10 : (6 + Math.min(Math.floor((num % 100) / 5), 4));
@@ -525,12 +536,20 @@
                     let x = Math.floor(rng() * (gridSize - (o === 'h' ? l : 1)));
                     let y = Math.floor(rng() * (gridSize - (o === 'v' ? l : 1)));
                     if (o === 'h' && y === keyY) continue; 
-                    if (!checkCollision(x, y, l, o, -1)) blocks.push({ x, y, l, o, k: false, obs: false, port: false });
+                    if (!checkCollision(x, y, l, o, -1)) blocks.push({ x, y, l, o, k: false, obs: false });
                 }
 
-                if (isSolvable(JSON.parse(JSON.stringify(blocks)), keyY)) solved = true;
-                else seed += 1;
+                if (isSolvable(JSON.parse(JSON.stringify(blocks)), keyY)) {
+                    solved = true;
+                } else {
+                    seed += 1;
+                }
             }
+
+            if (!solved) {
+                blocks = [{ x: 0, y: keyY, l: 2, o: 'h', k: true, obs: false }];
+            }
+
             initialPos = JSON.parse(JSON.stringify(blocks));
         }
 
@@ -540,14 +559,14 @@
             let steps = 0;
             let winX = gridSize - 2;
 
-            while (queue.length > 0 && steps < 800) {
+            while (queue.length > 0 && steps < 1000) {
                 steps++;
                 let currentBlocks = JSON.parse(queue.shift());
                 if (currentBlocks[0].x >= winX) return true;
 
                 for (let i = 0; i < currentBlocks.length; i++) {
                     let b = currentBlocks[i];
-                    if (b.obs || b.port) continue;
+                    if (b.obs) continue;
 
                     let dirs = b.o === 'h' ? [[1,0], [-1,0]] : [[0,1], [0,-1]];
                     for (let d of dirs) {
@@ -571,6 +590,17 @@
             const w = o === 'h' ? l : 1, h = o === 'v' ? l : 1;
             if (x < 0 || x + w > gridSize || y < 0 || y + h > gridSize) return false;
             return !currentBlocks.some((b, i) => {
+                if (i === idx) return false;
+                const bw = b.o === 'h' ? b.l : 1, bh = b.o === 'v' ? b.l : 1;
+                return x < b.x + bw && x + w > b.x && y < b.y + bh && y + h > b.y;
+            });
+        }
+
+        function checkCollision(x, y, l, o, idx) {
+            const w = o === 'h' ? l : 1, h = o === 'v' ? l : 1;
+            if (x < 0 || x + w > gridSize || y < 0 || y + h > gridSize) return true;
+            
+            return blocks.some((b, i) => {
                 if (i === idx) return false;
                 const bw = b.o === 'h' ? b.l : 1, bh = b.o === 'v' ? b.l : 1;
                 return x < b.x + bw && x + w > b.x && y < b.y + bh && y + h > b.y;
@@ -706,16 +736,15 @@
 
             blocks.forEach((b, i) => {
                 const div = document.createElement("div");
-                div.className = `block ${b.k ? 'block-key' : ''} ${b.obs ? 'block-obstacle' : ''} ${b.port ? 'block-portal' : ''}`;
+                div.className = `block ${b.k ? 'block-key' : ''} ${b.obs ? 'block-obstacle' : ''}`;
                 div.style.width = (b.o === 'h' ? b.l * cellSize : cellSize) - 4 + "px";
                 div.style.height = (b.o === 'v' ? b.l * cellSize : cellSize) - 4 + "px";
                 div.style.left = (b.x * cellSize + 2) + "px";
                 div.style.top = (b.y * cellSize + 2) + "px";
 
                 if (b.obs) div.innerHTML = "🔥";
-                if (b.port) div.innerHTML = "🌀";
 
-                if (b.obs || b.port) { grid.appendChild(div); return; }
+                if (b.obs) { grid.appendChild(div); return; }
 
                 div.onpointerdown = (e) => {
                     if (isDragging) return;
@@ -743,11 +772,6 @@
                                     }
                                 }
 
-                                if (curWorld === 5 && b.k && b.x === Math.floor(gridSize/2) - 1) {
-                                    let destX = gridSize - 2;
-                                    if (!checkCollision(destX, b.y, b.l, b.o, i)) b.x = destX;
-                                }
-
                             } else break;
                         }
 
@@ -773,16 +797,6 @@
                     };
                 };
                 grid.appendChild(div);
-            });
-        }
-
-        function checkCollision(x, y, l, o, idx) {
-            const w = o === 'h' ? l : 1, h = o === 'v' ? l : 1;
-            if (x < 0 || x + w > gridSize || y < 0 || y + h > gridSize) return true;
-            return blocks.some((b, i) => {
-                if (i === idx) return false;
-                const bw = b.o === 'h' ? b.l : 1, bh = b.o === 'v' ? b.l : 1;
-                return x < b.x + bw && x + w > b.x && y < b.y + bh && y + h > b.y;
             });
         }
 
@@ -855,7 +869,11 @@
             document.getElementById("level").innerText = level; 
         }
         function resetLevel() { blocks = JSON.parse(JSON.stringify(initialPos)); render(); resetTimer(); startTimer(); }
-        function nextLevel() { loadLevel(level + 1); }
+        
+        function nextLevel() {
+            document.getElementById("victory-screen").style.display = "none";
+            loadLevel(level + 1);
+        }
     </script>
 </body>
 </html>
