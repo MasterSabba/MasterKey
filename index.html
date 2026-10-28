@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Master Key - Multiverse Edition</title>
+
+    <!-- Firebase SDK Compat -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --bg: #0f1710;
@@ -295,6 +300,28 @@
     </div>
 
     <script>
+        // CONFIGURAZIONE FIREBASE & CLOUD SYNC
+        const firebaseConfig = {
+            apiKey: "AIzaSyBxZQF5OO5-znaipaPYeFcjOARjFXO1_gc",
+            authDomain: "mastersabba-games.firebaseapp.com",
+            databaseURL: "https://mastersabba-games-default-rtdb.firebaseio.com",
+            projectId: "mastersabba-games",
+            storageBucket: "mastersabba-games.firebasestorage.app",
+            messagingSenderId: "254141019232",
+            appId: "1:254141019232:web:29702c03b91f8a76677f05",
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('userId');
+        const playerParam = urlParams.get('player');
+
+        let userNick = playerParam || localStorage.getItem('nickname') || localStorage.getItem('username') || "Player";
+
         let gridSize = 6;
         let cellSize = 50;
         let blocks = [], initialPos = [], isDragging = false, timerInterval, seconds = 0;
@@ -308,8 +335,6 @@
         let rewardedLevels = JSON.parse(localStorage.getItem('mk_rewarded')) || [];
         let ownedSkins = JSON.parse(localStorage.getItem('mk_skins')) || ['default'];
         let currentSkin = localStorage.getItem('mk_currentSkin') || 'default';
-
-        let userNick = localStorage.getItem('nickname') || localStorage.getItem('username') || localStorage.getItem('mk_nick') || "Player";
         let activeTabWorld = 1;
 
         const availableSkins = [
@@ -329,11 +354,11 @@
             6: { name: "6: LABORATORIO GRAVITAZIONALE", desc: "Inversione di Gravità sui blocchi", cur: "💎" },
             7: { name: "7: REGNO DEL CREPUSCOLO", desc: "Nebbia d'Ombra Fitta", cur: "💎" },
             8: { name: "8: CYBER MATRIX ZERO", desc: "Tempo Limite a Conto alla Rovescia", cur: "💎" },
-            9: { name: "9: CATTEDRALE DEL CAOS", desc: "Comandi Invertiti e Specchiati", cur: "💎" },
+            9: { name: "9: CATTEDRALE DEL CAOS", desc: "Comandi di Precisione", cur: "💎" },
             10: { name: "10: SINGOLARITÀ COSMICA", desc: "Super Griglia 9x9 Spazio-Temporale", cur: "💎" }
         };
 
-        /* ENGINE PARTICELLE */
+        // ENGINE PARTICELLE
         const canvas = document.getElementById('particles-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -387,9 +412,28 @@
             requestAnimationFrame(animateParticles);
         }
 
+        // CARICAMENTO INIZIALE CON SINCRONIZZAZIONE CLOUD
         window.onload = () => {
-            updateUI();
-            loadLevel(level);
+            if (userId && userId !== 'guest' && db) {
+                db.ref('gameProgress/' + userId + '/masterKey').once('value').then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        if (data.level) { level = data.level; localStorage.setItem('mk_level', level); }
+                        if (data.unlockedLevel) { unlockedLevel = data.unlockedLevel; localStorage.setItem('mk_unlocked', unlockedLevel); }
+                        if (data.xp) { xp = data.xp; localStorage.setItem('mk_xp', xp); localStorage.setItem('points_masterkey', xp); }
+                        if (data.rewardedLevels) { rewardedLevels = data.rewardedLevels; localStorage.setItem('mk_rewarded', JSON.stringify(rewardedLevels)); }
+                    }
+                    updateUI();
+                    loadLevel(level);
+                }).catch(() => {
+                    updateUI();
+                    loadLevel(level);
+                });
+            } else {
+                updateUI();
+                loadLevel(level);
+            }
+
             setupSkinShop();
             initParticles();
             animateParticles();
@@ -431,12 +475,13 @@
             localStorage.setItem('mk_xp', xp);
             updateUI();
 
-            try {
-                if (typeof db !== 'undefined') {
-                    await db.collection("users").doc(userNick).set({ MasterKey: xp }, { merge: true });
-                }
-            } catch (e) {
-                console.error("Errore salvataggio Cloud:", e);
+            if (userId && userId !== 'guest' && db) {
+                await db.ref('gameProgress/' + userId + '/masterKey').set({
+                    level: level,
+                    unlockedLevel: unlockedLevel,
+                    xp: xp,
+                    rewardedLevels: rewardedLevels
+                });
             }
         }
 
@@ -459,27 +504,22 @@
                 return seed - Math.floor(seed);
             };
 
-            const keyY = 2;
+            const keyY = curWorld === 10 ? Math.floor(gridSize / 2) : 2;
 
             while (!solved && attempts < 100) {
                 attempts++;
                 blocks = [{ x: 0, y: keyY, l: 2, o: 'h', k: true, obs: false, port: false }];
 
                 if (curWorld === 3) {
-                    let obsCount = 2;
-                    for (let o = 0; o < obsCount; o++) {
-                        let ox = Math.floor(rng() * gridSize), oy = Math.floor(rng() * gridSize);
-                        if (oy !== keyY && !checkCollision(ox, oy, 1, 'h', -1)) {
-                            blocks.push({ x: ox, y: oy, l: 1, o: 'h', k: false, obs: true, port: false });
-                        }
-                    }
+                    let ox = Math.floor(gridSize / 2), oy = (keyY + 1) % gridSize;
+                    blocks.push({ x: ox, y: oy, l: 1, o: 'h', k: false, obs: true, port: false });
                 } else if (curWorld === 5) {
-                    blocks.push({ x: Math.floor(gridSize/2), y: keyY, l: 1, o: 'h', k: false, obs: false, port: true });
+                    blocks.push({ x: Math.floor(gridSize / 2), y: keyY, l: 1, o: 'h', k: false, obs: false, port: true });
                 }
 
-                let targetCount = 8 + Math.min(Math.floor((num % 100) / 4), 7);
+                let targetCount = curWorld === 10 ? 10 : (6 + Math.min(Math.floor((num % 100) / 5), 4));
                 
-                for (let i = 0; i < 200 && blocks.length < targetCount; i++) {
+                for (let i = 0; i < 100 && blocks.length < targetCount; i++) {
                     let l = rng() > 0.8 ? 3 : 2;
                     let o = rng() > 0.5 ? 'h' : 'v';
                     let x = Math.floor(rng() * (gridSize - (o === 'h' ? l : 1)));
@@ -488,21 +528,22 @@
                     if (!checkCollision(x, y, l, o, -1)) blocks.push({ x, y, l, o, k: false, obs: false, port: false });
                 }
 
-                if (isSolvable(JSON.parse(JSON.stringify(blocks)))) solved = true;
+                if (isSolvable(JSON.parse(JSON.stringify(blocks)), keyY)) solved = true;
                 else seed += 1;
             }
             initialPos = JSON.parse(JSON.stringify(blocks));
         }
 
-        function isSolvable(startBlocks) {
+        function isSolvable(startBlocks, targetY) {
             let queue = [JSON.stringify(startBlocks)];
             let visited = new Set([queue[0]]);
             let steps = 0;
+            let winX = gridSize - 2;
 
-            while (queue.length > 0 && steps < 1200) {
+            while (queue.length > 0 && steps < 800) {
                 steps++;
                 let currentBlocks = JSON.parse(queue.shift());
-                if (currentBlocks[0].x === 4) return true;
+                if (currentBlocks[0].x >= winX) return true;
 
                 for (let i = 0; i < currentBlocks.length; i++) {
                     let b = currentBlocks[i];
@@ -683,9 +724,8 @@
                     let startX = e.clientX, startY = e.clientY, ox = b.x, oy = b.y;
 
                     div.onpointermove = (em) => {
-                        let mult = (curWorld === 9) ? -1 : 1;
-                        let dx = Math.round(((em.clientX - startX) * mult) / cellSize);
-                        let dy = Math.round(((em.clientY - startY) * mult) / cellSize);
+                        let dx = Math.round((em.clientX - startX) / cellSize);
+                        let dy = Math.round((em.clientY - startY) / cellSize);
                         let target = (b.o === 'h' ? ox + dx : oy + dy);
                         let current = (b.o === 'h' ? b.x : b.y);
 
@@ -704,7 +744,8 @@
                                 }
 
                                 if (curWorld === 5 && b.k && b.x === Math.floor(gridSize/2) - 1) {
-                                    b.x = gridSize - 2;
+                                    let destX = gridSize - 2;
+                                    if (!checkCollision(destX, b.y, b.l, b.o, i)) b.x = destX;
                                 }
 
                             } else break;
@@ -727,7 +768,8 @@
                             div.style.top = (b.y * cellSize + 2) + "px";
                         }
 
-                        if (b.k && b.x === 4) handleWin();
+                        let winX = gridSize - 2;
+                        if (b.k && b.x >= winX) handleWin();
                     };
                 };
                 grid.appendChild(div);
@@ -754,8 +796,6 @@
                 let msg = "GIÀ FATTO";
                 let curWorld = getCurrentWorld(level);
                 let currencySymbol = curWorld === 1 ? '🪵' : '💎';
-
-                // FISSO: Sempre 100 punti per livello in qualsiasi mondo
                 const fixedPoints = 100;
 
                 if (!rewardedLevels.includes(level)) {
