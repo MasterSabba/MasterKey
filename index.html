@@ -66,7 +66,6 @@
             --board-shadow: 0 0 25px #4cc9f0;
             background: radial-gradient(circle at 50% 50%, #1d4e89 0%, #0f2b46 60%, #011627 100%);
         }
-        /* NUOVA ESTETICA MONDO 5: DESERTO DORATO / SUNSET DUNES */
         body.world-5 {
             --bg: #1c0c04; --wood: #d97706; --wood-dark: #271203; --gold: #fbbf24; --board-border: #b45309;
             --board-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 25px rgba(245, 158, 11, 0.4);
@@ -382,7 +381,6 @@
                     this.speedY = (Math.random() - 0.5) * 0.8;
                     this.color = `rgba(180, 255, 100, ${Math.random() * 0.7 + 0.2})`;
                 } else if (world === 5) {
-                    // Particelle calde/dorate per il Deserto Dorato
                     this.speedX = (Math.random() - 0.5) * 1.2;
                     this.speedY = -(Math.random() * 0.8 + 0.2);
                     this.color = `rgba(251, 191, 36, ${Math.random() * 0.8 + 0.2})`;
@@ -468,7 +466,6 @@
 
             cellSize = 300 / gridSize;
 
-            // POSIZIONE DINAMICA PORTA D'USCITA (Allineata perfettamente alla chiave)
             const doorStyle = document.getElementById('door-style');
             if (doorStyle) {
                 const keyY = worldNum === 10 ? Math.floor(gridSize / 2) : 2;
@@ -519,7 +516,7 @@
 
             const keyY = curWorld === 10 ? Math.floor(gridSize / 2) : 2;
 
-            while (!solved && attempts < 200) {
+            while (!solved && attempts < 250) {
                 attempts++;
                 blocks = [{ x: 0, y: keyY, l: 2, o: 'h', k: true, obs: false }];
 
@@ -528,7 +525,7 @@
                     blocks.push({ x: ox, y: oy, l: 1, o: 'h', k: false, obs: true });
                 }
 
-                let targetCount = curWorld === 10 ? 10 : (6 + Math.min(Math.floor((num % 100) / 5), 4));
+                let targetCount = curWorld === 10 ? 10 : (curWorld === 6 ? 5 : (6 + Math.min(Math.floor((num % 100) / 5), 4)));
                 
                 for (let i = 0; i < 100 && blocks.length < targetCount; i++) {
                     let l = rng() > 0.8 ? 3 : 2;
@@ -539,7 +536,13 @@
                     if (!checkCollision(x, y, l, o, -1)) blocks.push({ x, y, l, o, k: false, obs: false });
                 }
 
-                if (isSolvable(JSON.parse(JSON.stringify(blocks)), keyY)) {
+                // Applica gravità iniziale per la simulazione nel Mondo 6
+                let testBlocks = JSON.parse(JSON.stringify(blocks));
+                if (curWorld === 6) {
+                    applyGravityToState(testBlocks);
+                }
+
+                if (isSolvable(testBlocks, curWorld)) {
                     solved = true;
                 } else {
                     seed += 1;
@@ -548,18 +551,36 @@
 
             if (!solved) {
                 blocks = [{ x: 0, y: keyY, l: 2, o: 'h', k: true, obs: false }];
+            } else if (curWorld === 6) {
+                applyGravityToState(blocks);
             }
 
             initialPos = JSON.parse(JSON.stringify(blocks));
         }
 
-        function isSolvable(startBlocks, targetY) {
+        function applyGravityToState(stateBlocks) {
+            let moved = true;
+            while (moved) {
+                moved = false;
+                for (let i = 0; i < stateBlocks.length; i++) {
+                    let b = stateBlocks[i];
+                    if (b.o === 'v') {
+                        while (canMoveTo(b.x, b.y + 1, b.l, b.o, i, stateBlocks)) {
+                            b.y++;
+                            moved = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        function isSolvable(startBlocks, worldNum) {
             let queue = [JSON.stringify(startBlocks)];
             let visited = new Set([queue[0]]);
             let steps = 0;
             let winX = gridSize - 2;
 
-            while (queue.length > 0 && steps < 1000) {
+            while (queue.length > 0 && steps < 1200) {
                 steps++;
                 let currentBlocks = JSON.parse(queue.shift());
                 if (currentBlocks[0].x >= winX) return true;
@@ -576,7 +597,11 @@
                             let nx = nb.x + d[0], ny = nb.y + d[1];
                             if (canMoveTo(nx, ny, nb.l, nb.o, i, next)) {
                                 nb.x = nx; nb.y = ny;
-                                let state = JSON.stringify(next);
+                                let copyNext = JSON.parse(JSON.stringify(next));
+                                if (worldNum === 6) {
+                                    applyGravityToState(copyNext);
+                                }
+                                let state = JSON.stringify(copyNext);
                                 if (!visited.has(state)) { visited.add(state); queue.push(state); }
                             } else break;
                         }
@@ -787,9 +812,10 @@
                     div.onpointerup = () => {
                         isDragging = false; div.onpointermove = null;
                         
-                        if (curWorld === 6 && b.o === 'v') {
-                            while (!checkCollision(b.x, b.y + 1, b.l, b.o, i)) { b.y++; }
-                            div.style.top = (b.y * cellSize + 2) + "px";
+                        // Gravità immediata a ogni rilascio nel Mondo 6
+                        if (curWorld === 6) {
+                            applyGravityToState(blocks);
+                            render();
                         }
 
                         let winX = gridSize - 2;
