@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Master Key - Multiverse Edition</title>
+    <title>Master Key - Multiverse 10 Mondi</title>
     <style>
         :root {
             --bg: #0f1710;
@@ -12,7 +12,6 @@
             --gold: #ffd700;
             --board-border: #8b5a2b;
             --board-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 20px rgba(139, 90, 43, 0.4);
-            --particle-color: rgba(255, 215, 0, 0.6);
         }
 
         * {
@@ -36,38 +35,56 @@
             position: relative;
         }
 
-        /* SFONDI IMMERSIVI PER MONDI (BASE) */
+        /* SFONDI IMMERSIVI PER I 10 MONDI */
         body.world-1 {
-            --bg: #0b140d;
-            --wood: #a07246;
-            --wood-dark: #2c1a0e;
-            --gold: #f3c623;
-            --board-border: #5c3a21;
+            --bg: #0b140d; --wood: #a07246; --wood-dark: #2c1a0e; --gold: #f3c623; --board-border: #5c3a21;
             --board-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 25px rgba(46, 125, 50, 0.3);
-            --particle-color: rgba(180, 240, 100, 0.7);
             background: radial-gradient(circle at 50% 30%, #1e3822 0%, #0d1e11 50%, #050b06 100%);
         }
-
         body.world-2 {
-            --bg: #030814;
-            --wood: #00d4ff;
-            --wood-dark: #021329;
-            --gold: #00ffcc;
-            --board-border: #00d4ff;
+            --bg: #030814; --wood: #00d4ff; --wood-dark: #021329; --gold: #00ffcc; --board-border: #00d4ff;
             --board-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 30px rgba(0, 212, 255, 0.5);
-            --particle-color: rgba(0, 255, 204, 0.8);
             background: radial-gradient(circle at 50% 40%, #08214d 0%, #030d24 60%, #01040a 100%);
         }
-
         body.world-3 {
-            --bg: #140302;
-            --wood: #ff4500;
-            --wood-dark: #2b0602;
-            --gold: #ffcc00;
-            --board-border: #ff3300;
+            --bg: #140302; --wood: #ff4500; --wood-dark: #2b0602; --gold: #ffcc00; --board-border: #ff3300;
             --board-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 30px rgba(255, 69, 0, 0.6);
-            --particle-color: rgba(255, 120, 0, 0.85);
             background: radial-gradient(circle at 50% 70%, #4a0d05 0%, #210402 50%, #0a0101 100%);
+        }
+        body.world-4 {
+            --bg: #011627; --wood: #4cc9f0; --wood-dark: #0f2b46; --gold: #72efdd; --board-border: #4cc9f0;
+            --board-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 30px rgba(76, 201, 240, 0.6);
+            background: radial-gradient(circle at 50% 40%, #0c3b5e 0%, #041929 60%, #010a12 100%);
+        }
+        body.world-5 {
+            --bg: #130026; --wood: #b5179e; --wood-dark: #310052; --gold: #f72585; --board-border: #b5179e;
+            --board-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 30px rgba(181, 23, 158, 0.6);
+            background: radial-gradient(circle at 50% 50%, #4a007a 0%, #1e0036 60%, #0a0014 100%);
+        }
+        body.world-6 {
+            --bg: #0f172a; --wood: #38bdf8; --wood-dark: #1e293b; --gold: #facc15; --board-border: #38bdf8;
+            --board-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 30px rgba(56, 189, 248, 0.6);
+            background: radial-gradient(circle at 50% 60%, #1e3a5f 0%, #0f1e33 60%, #050b14 100%);
+        }
+        body.world-7 {
+            --bg: #05050a; --wood: #6b21a8; --wood-dark: #180e29; --gold: #a855f7; --board-border: #6b21a8;
+            --board-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 30px rgba(107, 33, 168, 0.6);
+            background: radial-gradient(circle at 50% 30%, #2e0854 0%, #120324 60%, #04000a 100%);
+        }
+        body.world-8 {
+            --bg: #021202; --wood: #10b981; --wood-dark: #022c14; --gold: #34d399; --board-border: #10b981;
+            --board-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 30px rgba(16, 185, 129, 0.6);
+            background: radial-gradient(circle at 50% 50%, #064e3b 0%, #02241b 60%, #000c09 100%);
+        }
+        body.world-9 {
+            --bg: #1c0505; --wood: #e11d48; --wood-dark: #3f0713; --gold: #fb7185; --board-border: #e11d48;
+            --board-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 30px rgba(225, 29, 72, 0.6);
+            background: radial-gradient(circle at 50% 50%, #6b0920 0%, #2d030c 60%, #0d0003 100%);
+        }
+        body.world-10 {
+            --bg: #090014; --wood: #8b5cf6; --wood-dark: #2e1065; --gold: #c084fc; --board-border: #8b5cf6;
+            --board-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 40px rgba(139, 92, 246, 0.8);
+            background: radial-gradient(circle at 50% 40%, #4c1d95 0%, #1e0545 60%, #080017 100%);
         }
 
         /* OVERRIDE DELLE SKIN SUI COLORI DEGLI ELEMENTI */
@@ -77,7 +94,7 @@
         body.skin-lava { --wood: #ff4500; --wood-dark: #330000; --gold: #ffcc00; --board-border: #ff4500; --board-shadow: 0 0 25px #ff4500; }
         body.skin-aqua { --wood: #00ffff; --wood-dark: #003333; --gold: #7fffd4; --board-border: #00ffff; --board-shadow: 0 0 25px #00ffff; }
 
-        /* VETTORE GRAFICO DI SFONDO DINAMICO */
+        /* STRATI VISUALI PER I PRIMI 3 MONDI */
         .bg-layer {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -94,30 +111,12 @@
             opacity: 1;
         }
 
-        /* ELEMENTI DELLA FORESTA */
         .trees-svg {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 45vh;
-            fill: #061008;
-            opacity: 0.85;
+            position: absolute; bottom: 0; width: 100%; height: 45vh; fill: #061008; opacity: 0.85;
         }
 
-        /* PARTICELLE DINAMICHE / BRACI / LUCCIOLE */
-        canvas#particles-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 2;
-        }
-
-        /* GRID CYBERPUNK MONDO 2 */
         .cyber-grid {
-            position: absolute;
-            width: 200%; height: 200%;
-            top: -50%; left: -50%;
+            position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
             background-image: 
                 linear-gradient(to right, rgba(0, 212, 255, 0.1) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(0, 212, 255, 0.1) 1px, transparent 1px);
@@ -125,107 +124,71 @@
             transform: perspective(500px) rotateX(60deg);
             animation: gridMove 20s linear infinite;
         }
-
         @keyframes gridMove {
             0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
             100% { transform: perspective(500px) rotateX(60deg) translateY(40px); }
         }
 
-        /* VOLCANO GLOW MONDO 3 */
         .lava-glow {
-            position: absolute;
-            bottom: -100px; left: 50%;
-            transform: translateX(-50%);
+            position: absolute; bottom: -100px; left: 50%; transform: translateX(-50%);
             width: 120vw; height: 350px;
             background: radial-gradient(ellipse at center, rgba(255, 69, 0, 0.4) 0%, rgba(255, 0, 0, 0.15) 50%, transparent 80%);
             animation: lavaPulse 4s ease-in-out infinite alternate;
         }
-
         @keyframes lavaPulse {
             0% { opacity: 0.6; transform: translateX(-50%) scale(0.95); }
             100% { opacity: 1; transform: translateX(-50%) scale(1.05); }
         }
 
+        canvas#particles-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2;
+        }
+
         .exit-button {
             position: absolute; top: 15px; left: 20px; font-size: 2rem; line-height: 1;
             color: rgba(255, 255, 255, 0.6); text-decoration: none; z-index: 100;
-            transition: all 0.2s ease; font-family: Arial, sans-serif;
-            cursor: pointer;
+            transition: all 0.2s ease; font-family: Arial, sans-serif; cursor: pointer;
         }
         .exit-button:hover { color: var(--gold); transform: scale(1.1); }
 
         #game-ui { 
-            position: relative; 
-            z-index: 10; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 12px;
-            backdrop-filter: blur(5px);
-            padding: 15px;
-            border-radius: 20px;
-            background: rgba(0, 0, 0, 0.35);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 10px;
+            backdrop-filter: blur(5px); padding: 15px; border-radius: 20px;
+            background: rgba(0, 0, 0, 0.35); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
         }
 
         .header { 
-            display: flex; 
-            gap: 20px; 
-            background: var(--wood-dark); 
-            padding: 10px 22px; 
-            border-radius: 15px; 
-            border: 2px solid var(--wood); 
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            transition: all 0.3s ease;
+            display: flex; gap: 20px; background: var(--wood-dark); padding: 10px 22px; 
+            border-radius: 15px; border: 2px solid var(--wood); align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: all 0.3s ease;
         }
         .stat-item { font-weight: bold; color: var(--gold); font-size: 1.1rem; display: flex; align-items: center; gap: 6px; }
         .btn-menu-top { 
-            background: var(--gold); 
-            color: #000;
-            border: none; 
-            font-weight: bold; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            padding: 7px 14px;
-            transition: transform 0.2s, background 0.2s;
+            background: var(--gold); color: #000; border: none; font-weight: bold; 
+            border-radius: 8px; cursor: pointer; padding: 7px 14px; transition: transform 0.2s;
         }
         .btn-menu-top:hover { transform: scale(1.05); }
 
         .world-badge {
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            padding: 4px 12px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 20px;
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            font-weight: bold;
-            text-transform: uppercase;
+            font-size: 0.85rem; letter-spacing: 1px; padding: 5px 14px;
+            background: rgba(0, 0, 0, 0.5); border-radius: 20px; border: 1px solid var(--gold);
+            color: var(--gold); font-weight: bold; text-transform: uppercase; text-align: center;
         }
+        .world-desc { font-size: 0.75rem; color: #ddd; margin-top: 2px; text-transform: none; }
 
         .level-tag { color: var(--gold); font-weight: bold; font-size: 1.3rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 
         .board-frame { 
-            padding: 14px; 
-            background: var(--wood-dark); 
-            border-radius: 18px; 
-            border: 4px solid var(--board-border); 
-            box-shadow: var(--board-shadow); 
-            transition: all 0.3s ease;
-            position: relative;
+            padding: 14px; background: var(--wood-dark); border-radius: 18px; 
+            border: 4px solid var(--board-border); box-shadow: var(--board-shadow); 
+            transition: all 0.3s ease; position: relative;
         }
 
         .grid { 
-            width: 300px; 
-            height: 300px; 
-            position: relative; 
-            background: rgba(0, 0, 0, 0.85); 
-            border-radius: 10px; 
-            overflow: visible;
+            width: 300px; height: 300px; position: relative; 
+            background: rgba(0, 0, 0, 0.85); border-radius: 10px; overflow: visible;
         }
 
-        /* PORTA DI USCITA RIGIDA E DEFINITA */
         .grid::after {
             content: ''; position: absolute; right: -18px; top: 100px; width: 20px; height: 50px; 
             background: var(--gold); border-radius: 0 8px 8px 0; box-shadow: 0 0 15px var(--gold); z-index: 5;
@@ -235,20 +198,30 @@
         .block {
             position: absolute; border-radius: 8px; box-sizing: border-box; border: 2px solid rgba(0,0,0,0.4);
             background: var(--wood); cursor: grab; box-shadow: inset 0 0 12px rgba(255,255,255,0.25), 0 4px 8px rgba(0,0,0,0.5);
-            touch-action: none;
-            transition: background 0.3s ease, border-color 0.3s ease;
+            touch-action: none; transition: background 0.3s ease, border-color 0.3s ease;
+            display: flex; justify-content: center; align-items: center; font-size: 1.1rem;
         }
         .block-key { 
-            background: var(--gold) !important; 
-            z-index: 10; 
-            border-color: #fff;
+            background: var(--gold) !important; z-index: 10; border-color: #fff;
             box-shadow: inset 0 0 15px rgba(255,255,255,0.8), 0 0 12px var(--gold);
         }
         .block-obstacle { 
-            background: #222 !important; 
-            border-color: #ff3300 !important; 
-            cursor: not-allowed; 
+            background: #222 !important; border-color: #ff3300 !important; cursor: not-allowed; 
             box-shadow: inset 0 0 10px #ff0000; 
+        }
+        .block-portal { 
+            background: #818cf8 !important; border-color: #c084fc !important; cursor: not-allowed; 
+            animation: pulse 1.5s infinite alternate; 
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .fog-overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: #000; opacity: 0.9; pointer-events: none; transition: opacity 0.3s; z-index: 8;
+            border-radius: 8px;
         }
 
         .footer-controls { display: flex; gap: 10px; margin-top: 5px; }
@@ -263,13 +236,15 @@
         .btn-wood.skin { background: #000; color: var(--gold); border: 1px solid var(--gold); }
 
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 100; justify-content: center; align-items: center; }
-        .modal { background: var(--wood-dark); padding: 25px; border-radius: 20px; border: 3px solid var(--wood); text-align: center; width: 88%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); transition: all 0.3s ease; }
+        .modal { background: var(--wood-dark); padding: 22px; border-radius: 20px; border: 3px solid var(--wood); text-align: center; width: 90%; max-width: 360px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
 
-        .world-tabs { display: flex; gap: 6px; margin-bottom: 15px; justify-content: center; }
-        .tab-btn { padding: 8px 12px; background: #000; color: #aaa; border: 1px solid var(--wood); border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+        .world-tabs-container {
+            display: flex; gap: 6px; overflow-x: auto; padding: 6px 0; margin-bottom: 12px; scroll-behavior: smooth;
+        }
+        .tab-btn { padding: 6px 12px; background: #000; color: #aaa; border: 1px solid var(--wood); border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: bold; white-space: nowrap; flex-shrink: 0; }
         .tab-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
 
-        .level-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0; max-height: 240px; overflow-y: auto; padding: 5px; }
+        .level-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 15px 0; max-height: 220px; overflow-y: auto; padding: 5px; }
         .lvl-btn { aspect-ratio: 1; background: rgba(0,0,0,0.6); color: var(--gold); border: 2px solid var(--wood); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
         .lvl-btn.locked { opacity: 0.3; cursor: not-allowed; }
         .lvl-btn.completed { border-color: var(--gold); background: rgba(255, 215, 0, 0.2); }
@@ -282,7 +257,7 @@
 
     <a href="#" onclick="window.close(); return false;" class="exit-button" title="Torna all'Hub">×</a>
 
-    <!-- SFONDI SPECIFICI DEI MONDI -->
+    <!-- SFONDI SPECIFICI DEI MONDI ORIGINALI -->
     <div id="bg-forest" class="bg-layer">
         <svg class="trees-svg" viewBox="0 0 1200 400" preserveAspectRatio="none">
             <path d="M0,400 L0,280 L30,220 L60,280 L90,200 L120,280 L150,180 L180,280 L210,230 L240,280 L270,190 L300,280 L330,210 L360,280 L390,160 L420,280 L450,220 L480,280 L510,190 L540,280 L570,240 L600,280 L630,170 L660,280 L690,220 L720,280 L750,200 L780,280 L810,150 L840,280 L870,210 L900,280 L930,230 L960,280 L990,180 L1020,280 L1050,220 L1080,280 L1110,190 L1140,280 L1170,230 L1200,280 L1200,400 Z" fill="#08180c"/>
@@ -298,7 +273,6 @@
         <div class="lava-glow"></div>
     </div>
 
-    <!-- CANVAS PER PARTICELLE (LUCCIOLE / NEON / BRACI) -->
     <canvas id="particles-canvas"></canvas>
     
     <div id="game-ui">
@@ -308,11 +282,16 @@
             <button class="btn-menu-top" onclick="toggleMenu()">MENU</button>
         </div>
 
-        <div class="world-badge" id="world-title">MONDO 1: FORESTA DI LEGNO</div>
+        <div class="world-badge">
+            <div id="world-title">MONDO 1: FORESTA DI LEGNO</div>
+            <div class="world-desc" id="world-desc">Meccanica Classica</div>
+        </div>
+
         <div class="level-tag">LIVELLO <span id="level">1</span></div>
 
         <div class="board-frame">
             <div id="grid" class="grid"></div>
+            <div id="fog" class="fog-overlay" style="display:none;"></div>
         </div>
 
         <div class="footer-controls">
@@ -321,15 +300,11 @@
         </div>
     </div>
 
-    <!-- MENU LIVELLI -->
+    <!-- MENU LIVELLI DEI 10 MONDI -->
     <div id="level-menu" class="overlay">
         <div class="modal">
-            <h2>LIVELLI</h2>
-            <div class="world-tabs">
-                <button class="tab-btn active" id="tab-w1" onclick="switchWorldTab(1)">Mondo 1</button>
-                <button class="tab-btn" id="tab-w2" onclick="switchWorldTab(2)">Mondo 2</button>
-                <button class="tab-btn" id="tab-w3" onclick="switchWorldTab(3)">Mondo 3</button>
-            </div>
+            <h2>SELEZIONA MONDO</h2>
+            <div class="world-tabs-container" id="tabs-holder"></div>
             <div id="level-grid" class="level-grid"></div>
             <button class="btn-wood" onclick="toggleMenu()">CHIUDI</button>
         </div>
@@ -357,7 +332,8 @@
     </div>
 
     <script>
-        const cellSize = 50;
+        let gridSize = 6;
+        let cellSize = 50;
         let blocks = [], initialPos = [], isDragging = false, timerInterval, seconds = 0;
 
         let level = parseInt(localStorage.getItem('mk_level')) || 1;
@@ -373,6 +349,19 @@
         let userNick = localStorage.getItem('nickname') || localStorage.getItem('username') || localStorage.getItem('mk_nick') || "Player";
         let activeTabWorld = 1;
 
+        const worldsData = [
+            { id: 1, name: "1: Foresta di Legno", desc: "Meccanica Classica", icon: "🪵" },
+            { id: 2, name: "2: Cripta Neon", desc: "Ambiente Cyberpunk", icon: "💎" },
+            { id: 3, name: "3: Vulcano Magmatico", desc: "Ostacoli di Fuoco Inamovibili", icon: "💎" },
+            { id: 4, name: "4: Abisso Cristallizzato", desc: "Fisica Scivolosa di Ghiaccio", icon: "❄️" },
+            { id: 5, name: "5: Dimensione Quantistica", desc: "Teletrasporto Portale Wormhole", icon: "🌀" },
+            { id: 6, name: "6: Laboratorio Gravitazionale", desc: "Inversione Gravitazionale Verticale", icon: "⚛️" },
+            { id: 7, name: "7: Regno del Crepuscolo", desc: "Nebbia d'Ombra Fitta", icon: "👁️" },
+            { id: 8, name: "8: Cyber Matrix", desc: "Timer Conto alla Rovescia (45s)", icon: "⚡" },
+            { id: 9, name: "9: Cattedrale del Caos", desc: "Comandi Invertiti e Specchiati", icon: "🔮" },
+            { id: 10, name: "10: Singolarità Cosmica", desc: "Super Griglia 9x9 Spazio-Temporale", icon: "🌌" }
+        ];
+
         const availableSkins = [
             { id: 'default', name: 'Classica Mondo', cost: 0 },
             { id: 'neon', name: 'Neon City (Glow)', cost: 500 },
@@ -381,7 +370,7 @@
             { id: 'aqua', name: 'Oceano (Glow)', cost: 3000 }
         ];
 
-        /* SISTEMA PARTICELLE DINAMICO */
+        /* ENGINE PARTICELLE DINAMICO */
         const canvas = document.getElementById('particles-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -394,9 +383,7 @@
         resizeCanvas();
 
         class Particle {
-            constructor(world) {
-                this.reset(world);
-            }
+            constructor(world) { this.reset(world); }
 
             reset(world) {
                 this.x = Math.random() * canvas.width;
@@ -404,19 +391,57 @@
                 this.size = Math.random() * 3 + 1;
                 this.world = world;
 
-                if (world === 1) { // Lucciole
-                    this.speedX = (Math.random() - 0.5) * 0.8;
-                    this.speedY = (Math.random() - 0.5) * 0.8;
-                    this.opacity = Math.random() * 0.7 + 0.2;
-                    this.color = `rgba(${180 + Math.random()*50}, 255, ${100 + Math.random()*50}, ${this.opacity})`;
-                } else if (world === 2) { // Particelle digitali
-                    this.speedX = 0;
-                    this.speedY = -(Math.random() * 1.5 + 0.5);
-                    this.color = `rgba(0, 212, 255, ${Math.random() * 0.8 + 0.2})`;
-                } else { // Braci del vulcano
-                    this.speedX = (Math.random() - 0.5) * 1.5;
-                    this.speedY = -(Math.random() * 2 + 1);
-                    this.color = `rgba(255, ${Math.floor(Math.random()*120)}, 0, ${Math.random() * 0.9 + 0.1})`;
+                switch(world) {
+                    case 1: // Lucciole
+                        this.speedX = (Math.random() - 0.5) * 0.8;
+                        this.speedY = (Math.random() - 0.5) * 0.8;
+                        this.color = `rgba(180, 255, 100, ${Math.random() * 0.7 + 0.2})`;
+                        break;
+                    case 2: // Cyber Neon
+                        this.speedX = 0;
+                        this.speedY = -(Math.random() * 1.5 + 0.5);
+                        this.color = `rgba(0, 212, 255, ${Math.random() * 0.8 + 0.2})`;
+                        break;
+                    case 3: // Braci Magma
+                        this.speedX = (Math.random() - 0.5) * 1.5;
+                        this.speedY = -(Math.random() * 2 + 1);
+                        this.color = `rgba(255, ${Math.floor(Math.random()*120)}, 0, ${Math.random() * 0.9 + 0.1})`;
+                        break;
+                    case 4: // Cristalli Neve
+                        this.speedX = (Math.random() - 0.5) * 0.5;
+                        this.speedY = Math.random() * 1.2 + 0.5;
+                        this.color = `rgba(220, 245, 255, ${Math.random() * 0.8 + 0.3})`;
+                        break;
+                    case 5: // Wormhole Quantistico
+                        this.speedX = (Math.random() - 0.5) * 2;
+                        this.speedY = (Math.random() - 0.5) * 2;
+                        this.color = `rgba(247, 37, 133, ${Math.random() * 0.8 + 0.2})`;
+                        break;
+                    case 6: // Gravità
+                        this.speedX = 0;
+                        this.speedY = Math.random() * 2 + 1;
+                        this.color = `rgba(56, 189, 248, ${Math.random() * 0.8 + 0.2})`;
+                        break;
+                    case 7: // Ombra
+                        this.speedX = (Math.random() - 0.5) * 0.5;
+                        this.speedY = (Math.random() - 0.5) * 0.5;
+                        this.color = `rgba(168, 85, 247, ${Math.random() * 0.6 + 0.1})`;
+                        break;
+                    case 8: // Matrix Code
+                        this.speedX = 0;
+                        this.speedY = Math.random() * 3 + 2;
+                        this.color = `rgba(52, 211, 153, ${Math.random() * 0.9 + 0.2})`;
+                        break;
+                    case 9: // Caos Red
+                        this.speedX = (Math.random() - 0.5) * 3;
+                        this.speedY = (Math.random() - 0.5) * 3;
+                        this.color = `rgba(251, 113, 133, ${Math.random() * 0.8 + 0.2})`;
+                        break;
+                    case 10: // Stelle Spaziali
+                        this.speedX = (Math.random() - 0.5) * 0.3;
+                        this.speedY = (Math.random() - 0.5) * 0.3;
+                        this.color = `rgba(192, 132, 252, ${Math.random() * 0.9 + 0.2})`;
+                        break;
                 }
             }
 
@@ -462,38 +487,31 @@
         };
 
         function getCurrentWorld(lvl) {
-            if (lvl <= 100) return 1;
-            if (lvl <= 200) return 2;
-            return 3;
+            return Math.min(10, Math.floor((lvl - 1) / 100) + 1);
         }
 
         function configureWorldSettings(worldNum) {
             const body = document.body;
-            
-            // Rimuovi tutte le classi skin e world precedenti
             body.className = '';
-
-            // Applica sempre la classe del mondo corrente per mostrare lo sfondo appropriato
             body.classList.add('world-' + worldNum);
 
-            // Se una skin diversa da 'default' è equipaggiata, aggiungi la classe skin corrispondente
             if (currentSkin && currentSkin !== 'default') {
                 body.classList.add('skin-' + currentSkin);
             }
 
-            const titleEl = document.getElementById("world-title");
-            if (worldNum === 1) {
-                titleEl.innerText = "MONDO 1: FORESTA DI LEGNO";
-            } else if (worldNum === 2) {
-                titleEl.innerText = "MONDO 2: CRIPTA NEON";
-            } else {
-                titleEl.innerText = "MONDO 3: VULCANO MAGMATICO";
-            }
+            const wData = worldsData[worldNum - 1];
+            document.getElementById("world-title").innerText = "MONDO " + wData.name.toUpperCase();
+            document.getElementById("world-desc").innerText = wData.desc;
+            document.getElementById("currency-icon").innerText = wData.icon;
 
-            const iconEl = document.getElementById("currency-icon");
-            if (iconEl) {
-                iconEl.innerText = (worldNum === 1) ? "🪵" : "💎";
-            }
+            // Mondi 1-9 mantengono griglia 6x6, Mondo 10 espanso a 9x9
+            if (worldNum === 10) gridSize = 9;
+            else gridSize = 6;
+
+            cellSize = 300 / gridSize;
+
+            const fogEl = document.getElementById("fog");
+            fogEl.style.display = (worldNum === 7) ? "block" : "none";
 
             initParticles();
         }
@@ -532,19 +550,24 @@
                 return seed - Math.floor(seed);
             };
 
-            while (!solved && attempts < 80) {
-                attempts++;
-                blocks = [{ x: 0, y: 2, l: 2, o: 'h', k: true, obs: false }];
+            const keyY = 2; // Y fissa a 2 per porta d'uscita classica
 
-                if (curWorld === 3) {
-                    let obsCount = 2;
+            while (!solved && attempts < 100) {
+                attempts++;
+                blocks = [{ x: 0, y: keyY, l: 2, o: 'h', k: true, obs: false, port: false }];
+
+                // Ostacoli nel Mondo 3 e 10
+                if (curWorld === 3 || curWorld === 10) {
+                    let obsCount = curWorld === 10 ? 3 : 2;
                     for (let o = 0; o < obsCount; o++) {
-                        let ox = Math.floor(rng() * 6);
-                        let oy = Math.floor(rng() * 6);
-                        if (oy !== 2 && !checkCollision(ox, oy, 1, 'h', -1)) {
-                            blocks.push({ x: ox, y: oy, l: 1, o: 'h', k: false, obs: true });
+                        let ox = Math.floor(rng() * gridSize), oy = Math.floor(rng() * gridSize);
+                        if (oy !== keyY && !checkCollision(ox, oy, 1, 'h', -1)) {
+                            blocks.push({ x: ox, y: oy, l: 1, o: 'h', k: false, obs: true, port: false });
                         }
                     }
+                } else if (curWorld === 5) {
+                    // Portale nel Mondo 5
+                    blocks.push({ x: Math.floor(gridSize/2), y: keyY, l: 1, o: 'h', k: false, obs: false, port: true });
                 }
 
                 let targetCount = 8 + Math.min(Math.floor((num % 100) / 4), 7);
@@ -552,11 +575,12 @@
                 for (let i = 0; i < 200 && blocks.length < targetCount; i++) {
                     let l = rng() > 0.8 ? 3 : 2;
                     let o = rng() > 0.5 ? 'h' : 'v';
-                    let x = Math.floor(rng() * (6 - (o === 'h' ? l : 1)));
-                    let y = Math.floor(rng() * (6 - (o === 'v' ? l : 1)));
-                    if (o === 'h' && y === 2) continue; 
-                    if (!checkCollision(x, y, l, o, -1)) blocks.push({ x, y, l, o, k: false, obs: false });
+                    let x = Math.floor(rng() * (gridSize - (o === 'h' ? l : 1)));
+                    let y = Math.floor(rng() * (gridSize - (o === 'v' ? l : 1)));
+                    if (o === 'h' && y === keyY) continue; 
+                    if (!checkCollision(x, y, l, o, -1)) blocks.push({ x, y, l, o, k: false, obs: false, port: false });
                 }
+
                 if (isSolvable(JSON.parse(JSON.stringify(blocks)))) solved = true;
                 else seed += 1;
             }
@@ -567,13 +591,16 @@
             let queue = [JSON.stringify(startBlocks)];
             let visited = new Set([queue[0]]);
             let steps = 0;
+            const targetX = gridSize - 2;
+
             while (queue.length > 0 && steps < 1200) {
                 steps++;
                 let currentBlocks = JSON.parse(queue.shift());
-                if (currentBlocks[0].x === 4) return true;
+                if (currentBlocks[0].x >= targetX) return true;
+
                 for (let i = 0; i < currentBlocks.length; i++) {
                     let b = currentBlocks[i];
-                    if (b.obs) continue;
+                    if (b.obs || b.port) continue;
 
                     let dirs = b.o === 'h' ? [[1,0], [-1,0]] : [[0,1], [0,-1]];
                     for (let d of dirs) {
@@ -595,7 +622,7 @@
 
         function canMoveTo(x, y, l, o, idx, currentBlocks) {
             const w = o === 'h' ? l : 1, h = o === 'v' ? l : 1;
-            if (x < 0 || x + w > 6 || y < 0 || y + h > 6) return false;
+            if (x < 0 || x + w > gridSize || y < 0 || y + h > gridSize) return false;
             return !currentBlocks.some((b, i) => {
                 if (i === idx) return false;
                 const bw = b.o === 'h' ? b.l : 1, bh = b.o === 'v' ? b.l : 1;
@@ -605,10 +632,20 @@
 
         function switchWorldTab(wNum) {
             activeTabWorld = wNum;
-            document.querySelectorAll('.tab-btn').forEach((b, idx) => {
-                b.classList.toggle('active', idx + 1 === wNum);
-            });
+            buildWorldTabs();
             renderLevelGrid();
+        }
+
+        function buildWorldTabs() {
+            const holder = document.getElementById("tabs-holder");
+            holder.innerHTML = '';
+            worldsData.forEach(w => {
+                const b = document.createElement("button");
+                b.className = `tab-btn ${w.id === activeTabWorld ? 'active' : ''}`;
+                b.innerHTML = `${w.icon} Mondo ${w.id}`;
+                b.onclick = () => switchWorldTab(w.id);
+                holder.appendChild(b);
+            });
         }
 
         function renderLevelGrid() {
@@ -640,7 +677,9 @@
             m.style.display = isOpening ? "flex" : "none";
             
             if (isOpening) {
-                switchWorldTab(getCurrentWorld(level));
+                activeTabWorld = getCurrentWorld(level);
+                buildWorldTabs();
+                renderLevelGrid();
             }
         }
 
@@ -650,23 +689,15 @@
             const shopGrid = document.getElementById("skin-grid");
             if (!shopGrid) return;
             shopGrid.innerHTML = '';
-            const currencyIcon = getCurrentWorld(level) === 1 ? '🪵' : '💎';
+            const curIcon = worldsData[getCurrentWorld(level) - 1].icon;
 
             availableSkins.forEach(skin => {
                 const item = document.createElement("div");
                 item.className = "skin-item";
-                
                 const isOwned = ownedSkins.includes(skin.id);
                 const isEquipped = currentSkin === skin.id;
 
-                let buttonLabel = '';
-                if (isEquipped) {
-                    buttonLabel = 'USATA';
-                } else if (isOwned) {
-                    buttonLabel = 'USA';
-                } else {
-                    buttonLabel = skin.cost + ' ' + currencyIcon;
-                }
+                let buttonLabel = isEquipped ? 'USATA' : (isOwned ? 'USA' : skin.cost + ' ' + curIcon);
 
                 item.innerHTML = `
                     <span>${skin.name}</span>
@@ -714,30 +745,31 @@
         }
 
         function loadLevel(num) {
-            level = num;
+            level = Math.min(1000, Math.max(1, num));
             localStorage.setItem('mk_level', level);
             document.getElementById("victory-screen").style.display = "none";
             document.getElementById("level-menu").style.display = "none";
-            generateHardLevel(num);
+            generateHardLevel(level);
             resetTimer(); startTimer(); render(); updateUI();
         }
 
         function render() {
             const grid = document.getElementById("grid");
             grid.innerHTML = '';
+            const curWorld = getCurrentWorld(level);
+
             blocks.forEach((b, i) => {
                 const div = document.createElement("div");
-                div.className = `block ${b.k ? 'block-key' : ''} ${b.obs ? 'block-obstacle' : ''}`;
+                div.className = `block ${b.k ? 'block-key' : ''} ${b.obs ? 'block-obstacle' : ''} ${b.port ? 'block-portal' : ''}`;
                 div.style.width = (b.o === 'h' ? b.l * cellSize : cellSize) - 4 + "px";
                 div.style.height = (b.o === 'v' ? b.l * cellSize : cellSize) - 4 + "px";
                 div.style.left = (b.x * cellSize + 2) + "px";
                 div.style.top = (b.y * cellSize + 2) + "px";
 
-                if (b.obs) {
-                    div.innerHTML = "<span style='display:flex;justify-content:center;align-items:center;height:100%;font-size:16px;'>🔥</span>";
-                    grid.appendChild(div);
-                    return;
-                }
+                if (b.obs) div.innerHTML = "🔥";
+                if (b.port) div.innerHTML = "🌀";
+
+                if (b.obs || b.port) { grid.appendChild(div); return; }
 
                 div.onpointerdown = (e) => {
                     if (isDragging) return;
@@ -746,24 +778,54 @@
                     let startX = e.clientX, startY = e.clientY, ox = b.x, oy = b.y;
 
                     div.onpointermove = (em) => {
-                        let dx = Math.round((em.clientX - startX) / cellSize);
-                        let dy = Math.round((em.clientY - startY) / cellSize);
+                        let mult = (curWorld === 9) ? -1 : 1; // Mondo 9: Comandi invertiti
+                        let dx = Math.round(((em.clientX - startX) * mult) / cellSize);
+                        let dy = Math.round(((em.clientY - startY) * mult) / cellSize);
                         let target = (b.o === 'h' ? ox + dx : oy + dy);
                         let current = (b.o === 'h' ? b.x : b.y);
 
                         while (current !== target) {
                             let step = target > current ? 1 : -1;
                             let nx = b.x + (b.o === 'h' ? step : 0), ny = b.y + (b.o === 'v' ? step : 0);
+                            
                             if (!checkCollision(nx, ny, b.l, b.o, i)) {
                                 b.x = nx; b.y = ny; current += step;
+
+                                // Mondo 4: Scivoloso (Ghiaccio)
+                                if (curWorld === 4) {
+                                    while (true) {
+                                        let snx = b.x + (b.o === 'h' ? step : 0), sny = b.y + (b.o === 'v' ? step : 0);
+                                        if (!checkCollision(snx, sny, b.l, b.o, i)) { b.x = snx; b.y = sny; } else break;
+                                    }
+                                }
+
+                                // Mondo 5: Portale Teletrasporto
+                                if (curWorld === 5 && b.k && b.x === Math.floor(gridSize/2) - 1) {
+                                    b.x = gridSize - 2;
+                                }
+
                             } else break;
                         }
+
                         div.style.left = (b.x * cellSize + 2) + "px";
                         div.style.top = (b.y * cellSize + 2) + "px";
+
+                        // Mondo 7: Trasparenza Nebbia
+                        if (curWorld === 7 && b.k) {
+                            document.getElementById("fog").style.opacity = Math.max(0.1, 0.9 - (b.x / gridSize));
+                        }
                     };
+
                     div.onpointerup = () => {
                         isDragging = false; div.onpointermove = null;
-                        if (b.k && b.x === 4) handleWin();
+                        
+                        // Mondo 6: Gravità verticale sui blocchi a fine mossa
+                        if (curWorld === 6 && b.o === 'v') {
+                            while (!checkCollision(b.x, b.y + 1, b.l, b.o, i)) { b.y++; }
+                            div.style.top = (b.y * cellSize + 2) + "px";
+                        }
+
+                        if (b.k && b.x >= gridSize - 2) handleWin();
                     };
                 };
                 grid.appendChild(div);
@@ -772,7 +834,7 @@
 
         function checkCollision(x, y, l, o, idx) {
             const w = o === 'h' ? l : 1, h = o === 'v' ? l : 1;
-            if (x < 0 || x + w > 6 || y < 0 || y + h > 6) return true;
+            if (x < 0 || x + w > gridSize || y < 0 || y + h > gridSize) return true;
             return blocks.some((b, i) => {
                 if (i === idx) return false;
                 const bw = b.o === 'h' ? b.l : 1, bh = b.o === 'v' ? b.l : 1;
@@ -787,27 +849,32 @@
                 key.style.transition = "left 0.5s ease-in"; key.style.left = "350px";
             }
             setTimeout(() => {
-                let msg = "GIÀ FATTO";
                 let curWorld = getCurrentWorld(level);
-                let currencySymbol = curWorld === 1 ? '🪵' : '💎';
+                let curIcon = worldsData[curWorld - 1].icon;
+                let msg = "GIÀ FATTO";
 
                 if (!rewardedLevels.includes(level)) {
-                    let newXp = xp + 100;
+                    let reward = 100 * curWorld;
+                    let newXp = xp + reward;
                     rewardedLevels.push(level);
                     localStorage.setItem('mk_rewarded', JSON.stringify(rewardedLevels));
                     savePoints(newXp);
-                    triggerGameWin(100);
-                    msg = `+100 ${currencySymbol}`;
+                    triggerGameWin(reward);
+                    msg = `+${reward} ${curIcon}`;
                 }
 
-                if (level === unlockedLevel) { unlockedLevel++; localStorage.setItem('mk_unlocked', unlockedLevel); }
+                if (level === unlockedLevel && unlockedLevel < 1000) { 
+                    unlockedLevel++; 
+                    localStorage.setItem('mk_unlocked', unlockedLevel); 
+                }
 
-                if (level === 100) {
-                    document.getElementById("win-title").innerText = "MONDO 1 SUPERATO! 🎉";
-                    msg += "<br>Sbloccato Mondo 2: Cripta Neon!";
-                } else if (level === 200) {
-                    document.getElementById("win-title").innerText = "MONDO 2 SUPERATO! 🔥";
-                    msg += "<br>Sbloccato Mondo 3: Vulcano Magmatico!";
+                if (level % 100 === 0 && level < 1000) {
+                    const nextW = worldsData[curWorld];
+                    document.getElementById("win-title").innerText = `MONDO ${curWorld} SUPERATO! 🎉`;
+                    msg += `<br>Sbloccato ${nextW.name}!`;
+                } else if (level === 1000) {
+                    document.getElementById("win-title").innerText = "MULTIVERSO COMPLETATO! 🏆";
+                    msg += "<br>Hai dominato tutti i 10 Mondi!";
                 } else {
                     document.getElementById("win-title").innerText = "COMPLETATO!";
                 }
@@ -820,11 +887,29 @@
 
         function startTimer() {
             clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                seconds++;
-                let m = Math.floor(seconds/60).toString().padStart(2,'0'), s = (seconds%60).toString().padStart(2,'0');
-                document.getElementById("timer").innerText = `${m}:${s}`;
-            }, 1000);
+            const curWorld = getCurrentWorld(level);
+            
+            if (curWorld === 8) { // Mondo 8: Countdown di 45 secondi
+                seconds = 45;
+                document.getElementById("timer").innerText = "00:45";
+                timerInterval = setInterval(() => {
+                    seconds--;
+                    let m = Math.floor(seconds/60).toString().padStart(2,'0'), s = (seconds%60).toString().padStart(2,'0');
+                    document.getElementById("timer").innerText = `${m}:${s}`;
+                    if (seconds <= 0) {
+                        clearInterval(timerInterval);
+                        alert("⏰ Tempo Scaduto!");
+                        resetLevel();
+                    }
+                }, 1000);
+            } else {
+                seconds = 0;
+                timerInterval = setInterval(() => {
+                    seconds++;
+                    let m = Math.floor(seconds/60).toString().padStart(2,'0'), s = (seconds%60).toString().padStart(2,'0');
+                    document.getElementById("timer").innerText = `${m}:${s}`;
+                }, 1000);
+            }
         }
 
         function resetTimer() { clearInterval(timerInterval); seconds = 0; document.getElementById("timer").innerText = "00:00"; }
@@ -833,7 +918,10 @@
             document.getElementById("level").innerText = level; 
         }
         function resetLevel() { blocks = JSON.parse(JSON.stringify(initialPos)); render(); resetTimer(); startTimer(); }
-        function nextLevel() { loadLevel(level + 1); }
+        function nextLevel() { 
+            if (level < 1000) loadLevel(level + 1); 
+            else toggleMenu();
+        }
     </script>
 </body>
 </html>
