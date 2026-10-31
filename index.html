@@ -313,15 +313,19 @@
             messagingSenderId: "254141019232",
             appId: "1:254141019232:web:29702c03b91f8a76677f05",
         };
-
-        if (!firebase.apps.length) {
+if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.database();
 
         const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('userId');
+        let userId = urlParams.get('userId');
         const playerParam = urlParams.get('player');
+
+        // Fallback automatico al localStorage dell'Hub se l'utente apre il gioco direttamente o ridimensiona
+        if (!userId || userId === 'guest') {
+            userId = localStorage.getItem('masterhub_logged_user');
+        }
 
         let userNick = playerParam || localStorage.getItem('nickname') || localStorage.getItem('username') || "Player";
 
@@ -838,7 +842,7 @@
             });
         }
 
-        function handleWin() {
+       function handleWin() {
             clearInterval(timerInterval);
             const key = document.querySelector('.block-key');
             if (key) {
@@ -850,16 +854,22 @@
                 let currencySymbol = curWorld === 1 ? '🪵' : '💎';
                 const fixedPoints = 100;
 
+                let newXp = xp;
                 if (!rewardedLevels.includes(level)) {
-                    let newXp = xp + fixedPoints;
+                    newXp += fixedPoints;
                     rewardedLevels.push(level);
                     localStorage.setItem('mk_rewarded', JSON.stringify(rewardedLevels));
-                    savePoints(newXp);
                     triggerGameWin(fixedPoints);
                     msg = `+${fixedPoints} ${currencySymbol}`;
                 }
 
-                if (level === unlockedLevel) { unlockedLevel++; localStorage.setItem('mk_unlocked', unlockedLevel); }
+                if (level === unlockedLevel) { 
+                    unlockedLevel++; 
+                    localStorage.setItem('mk_unlocked', unlockedLevel); 
+                }
+
+                // Salva e sincronizza su Firebase/LocalStorage indipendentemente dai punti bonus
+                savePoints(newXp);
 
                 if (level % 100 === 0 && level < 1000) {
                     document.getElementById("win-title").innerText = `MONDO ${curWorld} SUPERATO! 🎉`;
@@ -873,7 +883,6 @@
                 updateUI();
             }, 500);
         }
-
         function startTimer() {
             clearInterval(timerInterval);
             const curWorld = getCurrentWorld(level);
