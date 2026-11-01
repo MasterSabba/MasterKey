@@ -425,30 +425,55 @@ if (!firebase.apps.length) {
 
         // CARICAMENTO INIZIALE CON SINCRONIZZAZIONE CLOUD
         window.onload = () => {
-            if (userId && userId !== 'guest' && db) {
-                db.ref('gameProgress/' + userId + '/masterKey').once('value').then((snapshot) => {
-                    if (snapshot.exists()) {
-                        const data = snapshot.val();
-                        if (data.level) { level = data.level; localStorage.setItem('mk_level', level); }
-                        if (data.unlockedLevel) { unlockedLevel = data.unlockedLevel; localStorage.setItem('mk_unlocked', unlockedLevel); }
-                        if (data.xp) { xp = data.xp; localStorage.setItem('mk_xp', xp); localStorage.setItem('points_masterkey', xp); }
-                        if (data.rewardedLevels) { rewardedLevels = data.rewardedLevels; localStorage.setItem('mk_rewarded', JSON.stringify(rewardedLevels)); }
-                    }
-                    updateUI();
-                    loadLevel(level);
-                }).catch(() => {
-                    updateUI();
-                    loadLevel(level);
-                });
-            } else {
-                updateUI();
-                loadLevel(level);
+    if (userId && userId !== 'guest' && db) {
+        db.ref('gameProgress/' + userId + '/masterKey').once('value').then((snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                if (data.level) { level = data.level; localStorage.setItem('mk_level', level); }
+                if (data.unlockedLevel) { unlockedLevel = data.unlockedLevel; localStorage.setItem('mk_unlocked', unlockedLevel); }
+                if (data.xp) { xp = data.xp; localStorage.setItem('mk_xp', xp); localStorage.setItem('points_masterkey', xp); }
+                if (data.rewardedLevels) { rewardedLevels = data.rewardedLevels; localStorage.setItem('mk_rewarded', JSON.stringify(rewardedLevels)); }
             }
+            
+            // CONTROLLO URL (ha la priorità e sovrascrive tutto se presente)
+            checkUrlLevelOverride();
 
-            setupSkinShop();
-            initParticles();
-            animateParticles();
-        };
+            updateUI();
+            loadLevel(level);
+        }).catch(() => {
+            checkUrlLevelOverride();
+            updateUI();
+            loadLevel(level);
+        });
+    } else {
+        // CONTROLLO URL per utenti guest o offline
+        checkUrlLevelOverride();
+
+        updateUI();
+        loadLevel(level);
+    }
+
+    setupSkinShop();
+    initParticles();
+    animateParticles();
+};
+
+// Funzione di supporto per applicare il livello dall'URL
+function checkUrlLevelOverride() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramLevel = urlParams.get('level');
+
+    if (paramLevel && !isNaN(paramLevel)) {
+        let pLvl = parseInt(paramLevel, 10);
+        level = pLvl;
+        unlockedLevel = Math.max(unlockedLevel, pLvl);
+        
+        localStorage.setItem("mk_level", pLvl);
+        localStorage.setItem("mk_unlocked", unlockedLevel);
+        localStorage.setItem("freeTheKey_level", pLvl);
+        localStorage.setItem("freeTheKey_maxLevelUnlocked", unlockedLevel);
+    }
+}
 
         function getCurrentWorld(lvl) {
             return Math.min(10, Math.floor((lvl - 1) / 100) + 1);
