@@ -423,7 +423,6 @@ if (!firebase.apps.length) {
             requestAnimationFrame(animateParticles);
         }
 
-        // CARICAMENTO INIZIALE CON SINCRONIZZAZIONE CLOUD
         window.onload = () => {
     if (userId && userId !== 'guest' && db) {
         db.ref('gameProgress/' + userId + '/masterKey').once('value').then((snapshot) => {
@@ -435,7 +434,7 @@ if (!firebase.apps.length) {
                 if (data.rewardedLevels) { rewardedLevels = data.rewardedLevels; localStorage.setItem('mk_rewarded', JSON.stringify(rewardedLevels)); }
             }
             
-            // CONTROLLO URL (ha la priorità e sovrascrive tutto se presente)
+            // CONTROLLO URL: sovrascrive con il livello dell'Hub se presente
             checkUrlLevelOverride();
 
             updateUI();
@@ -446,7 +445,7 @@ if (!firebase.apps.length) {
             loadLevel(level);
         });
     } else {
-        // CONTROLLO URL per utenti guest o offline
+        // Per utenti guest o offline
         checkUrlLevelOverride();
 
         updateUI();
@@ -458,7 +457,7 @@ if (!firebase.apps.length) {
     animateParticles();
 };
 
-// Funzione di supporto per applicare il livello dall'URL
+// Funzione per intercettare il parametro ?level= dall'URL
 function checkUrlLevelOverride() {
     const urlParams = new URLSearchParams(window.location.search);
     const paramLevel = urlParams.get('level');
