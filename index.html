@@ -531,20 +531,22 @@ function checkUrlLevelOverride() {
         }
 
         async function savePoints(newXp) {
-            xp = newXp;
-            localStorage.setItem('points_masterkey', xp);
-            localStorage.setItem('mk_xp', xp);
-            updateUI();
+    xp = newXp;
+    localStorage.setItem('points_masterkey', xp);
+    localStorage.setItem('mk_xp', xp);
+    updateUI();
 
-            if (userId && userId !== 'guest' && db) {
-                await db.ref('gameProgress/' + userId + '/masterKey').set({
-                    level: level,
-                    unlockedLevel: unlockedLevel,
-                    xp: xp,
-                    rewardedLevels: rewardedLevels
-                });
+    if (userId && userId !== 'guest' && db) {
+        // Salva i progressi nel percorso esatto della struttura utente su Firebase
+        await db.ref('users/' + userId).update({
+            xp: xp,
+            winsPerGame: {
+                ...((await db.ref('users/' + userId + '/winsPerGame').once('value')).val() || {}),
+                "Free the Key": level
             }
-        }
+        });
+    }
+}
 
         function triggerGameWin(pointsGained) {
             const target = window.opener || (window.parent !== window ? window.parent : null);
