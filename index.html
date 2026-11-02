@@ -423,7 +423,7 @@ if (!firebase.apps.length) {
             requestAnimationFrame(animateParticles);
         }
 
-    window.onload = () => {
+window.onload = () => {
     const urlParams = new URLSearchParams(window.location.search);
     let currentUserId = urlParams.get('userId') || localStorage.getItem('masterhub_logged_user');
 
@@ -433,7 +433,6 @@ if (!firebase.apps.length) {
                 const userData = snapshot.val();
                 let foundLevel = null;
                 
-                // Cerca in modo flessibile tra tutte le voci salvate in winsPerGame
                 if (userData.winsPerGame) {
                     for (let key in userData.winsPerGame) {
                         let cleanKey = key.toLowerCase().replace(/[\s_-]/g, '');
