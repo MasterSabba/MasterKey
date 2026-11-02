@@ -422,26 +422,11 @@ if (!firebase.apps.length) {
             particles.forEach(p => { p.update(); p.draw(); });
             requestAnimationFrame(animateParticles);
         }
-
 window.onload = () => {
     const urlParams = new URLSearchParams(window.location.search);
     let currentUserId = urlParams.get('userId') || localStorage.getItem('masterhub_logged_user');
 
-    // Funzione per mostrare un messaggio visivo temporaneo sullo schermo dell'iPad
-    const showStatusBanner = (text, isError = false) => {
-        let banner = document.getElementById('debug-banner');
-        if (!banner) {
-            banner = document.createElement('div');
-            banner.id = 'debug-banner';
-            banner.style.cssText = "position:fixed; top:10px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); color:#fff; padding:8px 16px; border-radius:8px; font-size:14px; z-index:9999; border:1px solid #00f3ff; text-align:center; max-width:90vw;";
-            document.body.appendChild(banner);
-        }
-        banner.style.borderColor = isError ? '#ff0055' : '#00ff66';
-        banner.innerHTML = text;
-        setTimeout(() => { if (banner) banner.remove(); }, 5000);
-    };
-
-    const bootGame = (targetLevel, source) => {
+    const bootGame = (targetLevel) => {
         level = parseInt(targetLevel) || 1;
         unlockedLevel = Math.max(unlockedLevel, level);
         localStorage.setItem('mk_level', level);
@@ -451,41 +436,37 @@ window.onload = () => {
         setupSkinShop();
         initParticles();
         animateParticles();
-        showStatusBanner(`Caricato da: <b>${source}</b> (Livello: ${level})`);
     };
 
     if (currentUserId && currentUserId !== 'guest' && typeof db !== 'undefined' && db !== null) {
-        db.ref('users/' + currentUserId).once('value').then((snapshot) => {
+        db.ref('users/' + currentUserId + '/winsPerGame').once('value').then((snapshot) => {
             if (snapshot.exists()) {
-                const userData = snapshot.val();
+                const winsData = snapshot.val();
                 let cloudLevel = null;
                 
-                if (userData.winsPerGame) {
-                    for (let key in userData.winsPerGame) {
-                        let cleanKey = key.toLowerCase().replace(/[\s_-]/g, '');
-                        if (cleanKey.includes('freethekey') || cleanKey.includes('masterkey')) {
-                            cloudLevel = userData.winsPerGame[key];
-                            break;
-                        }
+                for (let key in winsData) {
+                    let cleanKey = key.toLowerCase().replace(/[\s_-]/g, '');
+                    if (cleanKey.includes('freethekey') || cleanKey.includes('masterkey')) {
+                        cloudLevel = winsData[key];
+                        break;
                     }
                 }
                 
                 if (cloudLevel !== null && cloudLevel > 1) {
-                    bootGame(cloudLevel, "Firebase Cloud");
+                    bootGame(cloudLevel);
                 } else {
-                    bootGame(parseInt(localStorage.getItem('mk_level')) || 1, "LocalStorage (Cloud <= 1)");
+                    bootGame(parseInt(localStorage.getItem('mk_level')) || 1);
                 }
             } else {
-                bootGame(parseInt(localStorage.getItem('mk_level')) || 1, "LocalStorage (Utente non in DB)");
+                bootGame(parseInt(localStorage.getItem('mk_level')) || 1);
             }
-        }).catch((err) => {
-            bootGame(parseInt(localStorage.getItem('mk_level')) || 1, "LocalStorage (Errore Cloud)");
+        }).catch(() => {
+            bootGame(parseInt(localStorage.getItem('mk_level')) || 1);
         });
     } else {
-        bootGame(parseInt(localStorage.getItem('mk_level')) || 1, "LocalStorage (No userId/DB)");
+        bootGame(parseInt(localStorage.getItem('mk_level')) || 1);
     }
 };
-
 
 // Funzione per intercettare il parametro ?level= dall'URL
 function checkUrlLevelOverride() {
