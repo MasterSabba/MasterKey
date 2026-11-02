@@ -423,31 +423,51 @@ if (!firebase.apps.length) {
             requestAnimationFrame(animateParticles);
         }
 
-        window.onload = () => {
-    if (userId && userId !== 'guest' && db) {
-        db.ref('gameProgress/' + userId + '/masterKey').once('value').then((snapshot) => {
+       window.onload = () => {
+    // 1. Recupera l'ID dell'utente dall'URL o dalla memoria locale
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentUserId = urlParams.get('userId') || localStorage.getItem('masterhub_logged_user');
+
+    if (currentUserId && currentUserId !== 'guest' && db) {
+        // 2. Carica i progressi specifici di QUESTO utente da Firebase
+        db.ref('gameProgress/' + currentUserId + '/masterKey').once('value').then((snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
-                if (data.level) { level = data.level; localStorage.setItem('mk_level', level); }
-                if (data.unlockedLevel) { unlockedLevel = data.unlockedLevel; localStorage.setItem('mk_unlocked', unlockedLevel); }
-                if (data.xp) { xp = data.xp; localStorage.setItem('mk_xp', xp); localStorage.setItem('points_masterkey', xp); }
-                if (data.rewardedLevels) { rewardedLevels = data.rewardedLevels; localStorage.setItem('mk_rewarded', JSON.stringify(rewardedLevels)); }
+                if (data.level) { 
+                    level = data.level; 
+                    localStorage.setItem('mk_level', level); 
+                }
+                if (data.unlockedLevel) { 
+                    unlockedLevel = data.unlockedLevel; 
+                    localStorage.setItem('mk_unlocked', unlockedLevel); 
+                }
+                if (data.xp) { 
+                    xp = data.xp; 
+                    localStorage.setItem('mk_xp', xp); 
+                    localStorage.setItem('points_masterkey', xp); 
+                }
+                if (data.rewardedLevels) { 
+                    rewardedLevels = data.rewardedLevels; 
+                    localStorage.setItem('mk_rewarded', JSON.stringify(rewardedLevels)); 
+                }
+            } else {
+                // Primo avvio per questo nuovo utente
+                level = parseInt(localStorage.getItem('mk_level')) || 1;
+                unlockedLevel = parseInt(localStorage.getItem('mk_unlocked')) || 1;
             }
-            
-            // CONTROLLO URL: sovrascrive con il livello dell'Hub se presente
-            checkUrlLevelOverride();
 
             updateUI();
             loadLevel(level);
         }).catch(() => {
-            checkUrlLevelOverride();
+            // Fallback locale in caso di errore di rete
+            level = parseInt(localStorage.getItem('mk_level')) || 1;
             updateUI();
             loadLevel(level);
         });
     } else {
-        // Per utenti guest o offline
-        checkUrlLevelOverride();
-
+        // Gestione Utente Ospite / Non Autenticato
+        level = parseInt(localStorage.getItem('mk_level')) || 1;
+        unlockedLevel = parseInt(localStorage.getItem('mk_unlocked')) || 1;
         updateUI();
         loadLevel(level);
     }
