@@ -423,51 +423,40 @@ if (!firebase.apps.length) {
             requestAnimationFrame(animateParticles);
         }
 
-       window.onload = () => {
-    // 1. Recupera l'ID dell'utente dall'URL o dalla memoria locale
+      window.onload = () => {
     const urlParams = new URLSearchParams(window.location.search);
     let currentUserId = urlParams.get('userId') || localStorage.getItem('masterhub_logged_user');
 
     if (currentUserId && currentUserId !== 'guest' && db) {
-        // 2. Carica i progressi specifici di QUESTO utente da Firebase
+        // Legge prima da Firebase per evitare problemi se il localStorage è vuoto
         db.ref('gameProgress/' + currentUserId + '/masterKey').once('value').then((snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
-                if (data.level) { 
-                    level = data.level; 
-                    localStorage.setItem('mk_level', level); 
-                }
-                if (data.unlockedLevel) { 
-                    unlockedLevel = data.unlockedLevel; 
-                    localStorage.setItem('mk_unlocked', unlockedLevel); 
-                }
-                if (data.xp) { 
-                    xp = data.xp; 
-                    localStorage.setItem('mk_xp', xp); 
-                    localStorage.setItem('points_masterkey', xp); 
-                }
-                if (data.rewardedLevels) { 
-                    rewardedLevels = data.rewardedLevels; 
-                    localStorage.setItem('mk_rewarded', JSON.stringify(rewardedLevels)); 
-                }
+                level = data.level || 1;
+                unlockedLevel = data.unlockedLevel || 1;
+                xp = data.xp || 0;
+                rewardedLevels = data.rewardedLevels || [];
+                
+                // Aggiorna anche il locale per sicurezza
+                localStorage.setItem('mk_level', level);
+                localStorage.setItem('mk_unlocked', unlockedLevel);
+                localStorage.setItem('mk_xp', xp);
             } else {
-                // Primo avvio per questo nuovo utente
-                level = parseInt(localStorage.getItem('mk_level')) || 1;
-                unlockedLevel = parseInt(localStorage.getItem('mk_unlocked')) || 1;
+                // Se Firebase è completamente vuoto per questo utente, imposta il livello 1
+                level = 1;
+                unlockedLevel = 1;
             }
-
             updateUI();
             loadLevel(level);
         }).catch(() => {
-            // Fallback locale in caso di errore di rete
+            // Fallback su localStorage in caso di assenza di rete
             level = parseInt(localStorage.getItem('mk_level')) || 1;
             updateUI();
             loadLevel(level);
         });
     } else {
-        // Gestione Utente Ospite / Non Autenticato
+        // Utente ospite
         level = parseInt(localStorage.getItem('mk_level')) || 1;
-        unlockedLevel = parseInt(localStorage.getItem('mk_unlocked')) || 1;
         updateUI();
         loadLevel(level);
     }
@@ -476,7 +465,6 @@ if (!firebase.apps.length) {
     initParticles();
     animateParticles();
 };
-
 // Funzione per intercettare il parametro ?level= dall'URL
 function checkUrlLevelOverride() {
     const urlParams = new URLSearchParams(window.location.search);
