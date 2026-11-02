@@ -423,20 +423,30 @@ if (!firebase.apps.length) {
             requestAnimationFrame(animateParticles);
         }
 
-      window.onload = () => {
+    window.onload = () => {
     const urlParams = new URLSearchParams(window.location.search);
     let currentUserId = urlParams.get('userId') || localStorage.getItem('masterhub_logged_user');
 
     if (currentUserId && currentUserId !== 'guest' && db) {
-        // Legge dal percorso corretto che usi nel tuo database Firebase
         db.ref('users/' + currentUserId).once('value').then((snapshot) => {
             if (snapshot.exists()) {
                 const userData = snapshot.val();
+                let foundLevel = null;
                 
-                // Recupera il livello dal percorso winsPerGame/Free the Key
-                if (userData.winsPerGame && userData.winsPerGame['Free the Key']) {
-                    level = userData.winsPerGame['Free the Key'];
-                    unlockedLevel = level;
+                // Cerca in modo flessibile tra tutte le voci salvate in winsPerGame
+                if (userData.winsPerGame) {
+                    for (let key in userData.winsPerGame) {
+                        let cleanKey = key.toLowerCase().replace(/[\s_-]/g, '');
+                        if (cleanKey.includes('freethekey') || cleanKey.includes('masterkey')) {
+                            foundLevel = userData.winsPerGame[key];
+                            break;
+                        }
+                    }
+                }
+                
+                if (foundLevel !== null) {
+                    level = foundLevel;
+                    unlockedLevel = foundLevel;
                 } else {
                     level = parseInt(localStorage.getItem('mk_level')) || 1;
                     unlockedLevel = parseInt(localStorage.getItem('mk_unlocked')) || 1;
