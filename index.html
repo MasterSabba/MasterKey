@@ -427,54 +427,56 @@ window.onload = () => {
     const urlParams = new URLSearchParams(window.location.search);
     let currentUserId = urlParams.get('userId') || localStorage.getItem('masterhub_logged_user');
 
+    // Funzione interna per avviare il gioco con il livello corretto
+    const bootGame = (targetLevel) => {
+        level = parseInt(targetLevel) || 1;
+        unlockedLevel = Math.max(unlockedLevel, level);
+        localStorage.setItem('mk_level', level);
+        localStorage.setItem('mk_unlocked', unlockedLevel);
+        updateUI();
+        loadLevel(level);
+        setupSkinShop();
+        initParticles();
+        animateParticles();
+    };
+
     if (currentUserId && currentUserId !== 'guest' && db) {
         db.ref('users/' + currentUserId).once('value').then((snapshot) => {
             if (snapshot.exists()) {
                 const userData = snapshot.val();
-                let foundLevel = null;
+                let cloudLevel = null;
                 
+                // Ricerca flessibile nel nodo winsPerGame
                 if (userData.winsPerGame) {
                     for (let key in userData.winsPerGame) {
                         let cleanKey = key.toLowerCase().replace(/[\s_-]/g, '');
                         if (cleanKey.includes('freethekey') || cleanKey.includes('masterkey')) {
-                            foundLevel = userData.winsPerGame[key];
+                            cloudLevel = userData.winsPerGame[key];
                             break;
                         }
                     }
                 }
                 
-                if (foundLevel !== null) {
-                    level = foundLevel;
-                    unlockedLevel = foundLevel;
+                // Se Firebase ha un livello salvato (> 1), usiamo quello come priorità assoluta
+                if (cloudLevel !== null && cloudLevel > 1) {
+                    bootGame(cloudLevel);
                 } else {
-                    level = parseInt(localStorage.getItem('mk_level')) || 1;
-                    unlockedLevel = parseInt(localStorage.getItem('mk_unlocked')) || 1;
+                    // Altrimenti fallback sul localStorage
+                    let localLvl = parseInt(localStorage.getItem('mk_level')) || 1;
+                    bootGame(localLvl);
                 }
-                
-                localStorage.setItem('mk_level', level);
-                localStorage.setItem('mk_unlocked', unlockedLevel);
             } else {
-                level = parseInt(localStorage.getItem('mk_level')) || 1;
-                unlockedLevel = parseInt(localStorage.getItem('mk_unlocked')) || 1;
+                bootGame(parseInt(localStorage.getItem('mk_level')) || 1);
             }
-            updateUI();
-            loadLevel(level);
         }).catch(() => {
-            level = parseInt(localStorage.getItem('mk_level')) || 1;
-            updateUI();
-            loadLevel(level);
+            bootGame(parseInt(localStorage.getItem('mk_level')) || 1);
         });
     } else {
-        level = parseInt(localStorage.getItem('mk_level')) || 1;
-        unlockedLevel = parseInt(localStorage.getItem('mk_unlocked')) || 1;
-        updateUI();
-        loadLevel(level);
+        bootGame(parseInt(localStorage.getItem('mk_level')) || 1);
     }
-
-    setupSkinShop();
-    initParticles();
-    animateParticles();
 };
+
+
 // Funzione per intercettare il parametro ?level= dall'URL
 function checkUrlLevelOverride() {
     const urlParams = new URLSearchParams(window.location.search);
