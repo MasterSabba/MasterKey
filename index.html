@@ -265,17 +265,16 @@
         for (let w = 1; w <= 100; w++) {
             let cur = currencies[(w - 1) % currencies.length];
             let hue = (w * 137.5) % 360; 
-            let name = w === 100 ? `Mondo ${w} ${cur}: Fine del Multiverso` : `Mondo Dimensionale ${w} ${cur}`;
+            let name = w === 100 ? `Mondo ${w} ${cur}: Fine del Multiverso` : `Mondo ${w} ${cur}: Mondo Dimensionale ${w}`;
             worldConfig[w] = { name: name, cur: cur, hue: hue };
         }
 
-        // FUNZIONE DI RIPARAZIONE AUTOMATICA: Sblocca tutti i mondi precedenti in base al livello attuale
+        // SINCRONIZZAZIONE E SBLOCCO AUTOMATICO DEI MONDI PASSATI (Fix per utente al livello alto)
         function syncAndUnlockPreviousWorlds() {
             if (level > 1) {
                 unlockedLevel = Math.max(unlockedLevel, level);
                 localStorage.setItem('mk_unlocked', unlockedLevel);
                 
-                // Segna automaticamente come completati tutti i livelli prima di quello attuale
                 let updated = false;
                 for (let i = 1; i < level; i++) {
                     if (!rewardedLevels.includes(i)) {
@@ -359,7 +358,7 @@
 
             const bootGame = (targetLevel) => {
                 level = parseInt(targetLevel) || 1;
-                syncAndUnlockPreviousWorlds(); // SINCRONIZZA E SBLOCCA TUTTI I MONDI PRECEDENTI
+                syncAndUnlockPreviousWorlds();
 
                 updateUI();
                 loadLevel(level);
@@ -466,35 +465,44 @@
             }
         }
 
-        // GENERATORE BILANCIATO E FLUIDO
-        function generateLevel(num) {
+        // GENERATORE DI LIVELLI RICCO E SFIDANTE RIPRESO DALLA VERSIONE ORIGINALE
+        function generateHardLevel(num) {
             const curWorld = getCurrentWorld(num);
             configureWorldSettings(curWorld);
 
-            let seed = num * 99.7;
-            const rng = () => { seed = Math.sin(seed) * 10000; return seed - Math.floor(seed); };
+            let solved = false;
+            let attempts = 0;
+            let seed = num * 1234.5;
+            const rng = () => {
+                seed = Math.sin(seed) * 10000;
+                return seed - Math.floor(seed);
+            };
 
             const keyY = (curWorld % 10 === 0 || curWorld === 100) ? Math.floor(gridSize / 2) : 2;
 
-            blocks = [{ x: 1, y: keyY, l: 2, o: 'h', k: true, obs: false }];
-
-            let targetCount = (curWorld % 10 === 0 || curWorld === 100) ? 7 : 4;
-            let attempts = 0;
-
-            while (blocks.length < targetCount && attempts < 100) {
+            while (!solved && attempts < 200) {
                 attempts++;
-                let l = 2;
-                let o = rng() > 0.5 ? 'h' : 'v';
-                let x = Math.floor(rng() * (gridSize - (o === 'h' ? l : 1)));
-                let y = Math.floor(rng() * (gridSize - (o === 'v' ? l : 1)));
+                blocks = [{ x: 0, y: keyY, l: 2, o: 'h', k: true, obs: false }];
 
-                if (o === 'h' && y === keyY) continue;
-                if (x <= 2 && y === keyY) continue; 
-
-                if (!checkCollision(x, y, l, o, -1)) {
-                    blocks.push({ x, y, l, o, k: false, obs: false });
+                if (curWorld % 10 === 3) {
+                    let ox = Math.floor(gridSize / 2), oy = (keyY + 1) % gridSize;
+                    blocks.push({ x: ox, y: oy, l: 1, o: 'h', k: false, obs: true });
                 }
+
+                // Numero elevato di blocchi per garantire una sfida stimolante
+                let targetCount = (curWorld % 10 === 0 || curWorld === 100) ? 10 : (6 + Math.min(Math.floor((num % 100) / 5), 4));
+
+                for (let i = 0; i < 150 && blocks.length < targetCount; i++) {
+                    let l = rng() > 0.75 ? 3 : 2;
+                    let o = rng() > 0.5 ? 'h' : 'v';
+                    let x = Math.floor(rng() * (gridSize - (o === 'h' ? l : 1)));
+                    let y = Math.floor(rng() * (gridSize - (o === 'v' ? l : 1)));
+                    if (o === 'h' && y === keyY) continue; 
+                    if (!checkCollision(x, y, l, o, -1)) blocks.push({ x, y, l, o, k: false, obs: false });
+                }
+                solved = true;
             }
+
             initialPos = JSON.parse(JSON.stringify(blocks));
         }
 
@@ -552,6 +560,11 @@
                         }
                         div.style.left = (b.x * cellSize + 2) + "px";
                         div.style.top = (b.y * cellSize + 2) + "px";
+
+                        if (curWorld % 10 === 7 && b.k) {
+                            const fog = document.getElementById("fog");
+                            if (fog) fog.style.opacity = Math.max(0.2, 0.9 - (b.x / gridSize));
+                        }
                     };
 
                     div.onpointerup = () => {
@@ -652,7 +665,7 @@
             localStorage.setItem('mk_level', level);
             document.getElementById("victory-screen").style.display = "none";
             document.getElementById("level-menu").style.display = "none";
-            generateLevel(num);
+            generateHardLevel(num);
             resetTimer(); startTimer(); render(); updateUI();
         }
 
@@ -719,7 +732,7 @@
 
             for (let i = startLvl; i <= endLvl; i++) {
                 const btn = document.createElement("div");
-                let locked = i > level; // Sblocca automaticamente fino al livello attuale
+                let locked = i > level;
                 let isCompleted = rewardedLevels.includes(i) || i < level;
                 btn.className = `lvl-btn ${locked ? 'locked' : (isCompleted ? 'completed' : '')}`;
                 btn.innerHTML = locked ? '🔒' : i;
