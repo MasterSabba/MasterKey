@@ -265,8 +265,28 @@
         for (let w = 1; w <= 100; w++) {
             let cur = currencies[(w - 1) % currencies.length];
             let hue = (w * 137.5) % 360; 
-            let name = w === 100 ? `Mondo ${w} ${cur}: Fine del Multiverso` : `Mondo ${w} ${cur}: Mondo Dimensionale ${w}`;
+            let name = w === 100 ? `Mondo ${w} ${cur}: Fine del Multiverso` : `Mondo Dimensionale ${w} ${cur}`;
             worldConfig[w] = { name: name, cur: cur, hue: hue };
+        }
+
+        // FUNZIONE DI RIPARAZIONE AUTOMATICA: Sblocca tutti i mondi precedenti in base al livello attuale
+        function syncAndUnlockPreviousWorlds() {
+            if (level > 1) {
+                unlockedLevel = Math.max(unlockedLevel, level);
+                localStorage.setItem('mk_unlocked', unlockedLevel);
+                
+                // Segna automaticamente come completati tutti i livelli prima di quello attuale
+                let updated = false;
+                for (let i = 1; i < level; i++) {
+                    if (!rewardedLevels.includes(i)) {
+                        rewardedLevels.push(i);
+                        updated = true;
+                    }
+                }
+                if (updated) {
+                    localStorage.setItem('mk_rewarded', JSON.stringify(rewardedLevels));
+                }
+            }
         }
 
         function applyDynamicWorldStyle(worldNum) {
@@ -339,9 +359,7 @@
 
             const bootGame = (targetLevel) => {
                 level = parseInt(targetLevel) || 1;
-                unlockedLevel = Math.max(unlockedLevel, level);
-                localStorage.setItem('mk_level', level);
-                localStorage.setItem('mk_unlocked', unlockedLevel);
+                syncAndUnlockPreviousWorlds(); // SINCRONIZZA E SBLOCCA TUTTI I MONDI PRECEDENTI
 
                 updateUI();
                 loadLevel(level);
@@ -384,11 +402,7 @@
             if (paramLevel && !isNaN(paramLevel)) {
                 let pLvl = parseInt(paramLevel, 10);
                 level = pLvl;
-                unlockedLevel = Math.max(unlockedLevel, pLvl);
                 localStorage.setItem("mk_level", pLvl);
-                localStorage.setItem("mk_unlocked", unlockedLevel);
-                localStorage.setItem("freeTheKey_level", pLvl);
-                localStorage.setItem("freeTheKey_maxLevelUnlocked", unlockedLevel);
             }
         }
 
@@ -452,35 +466,34 @@
             }
         }
 
+        // GENERATORE BILANCIATO E FLUIDO
         function generateLevel(num) {
             const curWorld = getCurrentWorld(num);
             configureWorldSettings(curWorld);
 
-            let solved = false;
-            let attempts = 0;
-            let seed = num * 123.4;
+            let seed = num * 99.7;
             const rng = () => { seed = Math.sin(seed) * 10000; return seed - Math.floor(seed); };
 
             const keyY = (curWorld % 10 === 0 || curWorld === 100) ? Math.floor(gridSize / 2) : 2;
 
-            while (!solved && attempts < 200) {
+            blocks = [{ x: 1, y: keyY, l: 2, o: 'h', k: true, obs: false }];
+
+            let targetCount = (curWorld % 10 === 0 || curWorld === 100) ? 7 : 4;
+            let attempts = 0;
+
+            while (blocks.length < targetCount && attempts < 100) {
                 attempts++;
-                blocks = [{ x: 0, y: keyY, l: 2, o: 'h', k: true, obs: false }];
+                let l = 2;
+                let o = rng() > 0.5 ? 'h' : 'v';
+                let x = Math.floor(rng() * (gridSize - (o === 'h' ? l : 1)));
+                let y = Math.floor(rng() * (gridSize - (o === 'v' ? l : 1)));
 
-                if (curWorld % 10 === 3) {
-                    blocks.push({ x: Math.floor(gridSize / 2), y: (keyY + 1) % gridSize, l: 1, o: 'h', k: false, obs: true });
-                }
+                if (o === 'h' && y === keyY) continue;
+                if (x <= 2 && y === keyY) continue; 
 
-                let targetCount = (curWorld % 10 === 0 || curWorld === 100) ? 10 : 6;
-                for (let i = 0; i < 100 && blocks.length < targetCount; i++) {
-                    let l = rng() > 0.7 ? 3 : 2;
-                    let o = rng() > 0.5 ? 'h' : 'v';
-                    let x = Math.floor(rng() * (gridSize - (o === 'h' ? l : 1)));
-                    let y = Math.floor(rng() * (gridSize - (o === 'v' ? l : 1)));
-                    if (o === 'h' && y === keyY) continue;
-                    if (!checkCollision(x, y, l, o, -1)) blocks.push({ x, y, l, o, k: false, obs: false });
+                if (!checkCollision(x, y, l, o, -1)) {
+                    blocks.push({ x, y, l, o, k: false, obs: false });
                 }
-                solved = true;
             }
             initialPos = JSON.parse(JSON.stringify(blocks));
         }
@@ -578,8 +591,8 @@
 
                 let wasLastLevelOfWorld = (level % 100 === 0);
 
-                if (level === unlockedLevel) { 
-                    unlockedLevel++; 
+                if (level >= unlockedLevel) { 
+                    unlockedLevel = level + 1;
                     localStorage.setItem('mk_unlocked', unlockedLevel); 
                 }
 
@@ -593,7 +606,6 @@
                     document.getElementById("victory-xp-msg").innerHTML = "Hai superato tutti i 100 Mondi!<br><b>Prossimi mondi in arrivo a breve!</b>";
                     document.getElementById("victory-buttons-container").innerHTML = `<button class="btn-wood gold" onclick="toggleMenu()">MONDI</button>`;
                 } else if (wasLastLevelOfWorld) {
-                    // CONTROLLO RIGOROSO: Verifica se mancano livelli precedenti in questo mondo
                     let startLvl = (curWorld - 1) * 100 + 1;
                     let endLvl = curWorld * 100;
                     let missingLevels = false;
@@ -707,8 +719,8 @@
 
             for (let i = startLvl; i <= endLvl; i++) {
                 const btn = document.createElement("div");
-                let locked = i > unlockedLevel;
-                let isCompleted = rewardedLevels.includes(i);
+                let locked = i > level; // Sblocca automaticamente fino al livello attuale
+                let isCompleted = rewardedLevels.includes(i) || i < level;
                 btn.className = `lvl-btn ${locked ? 'locked' : (isCompleted ? 'completed' : '')}`;
                 btn.innerHTML = locked ? '🔒' : i;
                 if (!locked) btn.onclick = () => loadLevel(i);
@@ -755,10 +767,9 @@
                 skipCost += 50;
                 localStorage.setItem('mk_skip_cost', skipCost);
 
-                if (level >= unlockedLevel) {
-                    unlockedLevel = level + 1;
-                    localStorage.setItem('mk_unlocked', unlockedLevel);
-                }
+                level++;
+                localStorage.setItem('mk_level', level);
+                syncAndUnlockPreviousWorlds();
                 showPopup("Livello saltato! Prossimo livello sbloccato.");
                 savePoints(xp);
                 toggleGemShop();
