@@ -265,7 +265,7 @@
         for (let w = 1; w <= 100; w++) {
             let cur = currencies[(w - 1) % currencies.length];
             let hue = (w * 137.5) % 360; 
-            let name = w === 100 ? `Mondo ${w} ${cur}: Fine del Multiverso` : `Mondo ${w} ${cur}: Mondo Dimensionale ${w}`;
+            let name = w === 100 ? `Mondo ${w} ${cur}: Fine del Multiverso` : `Mondo Dimensionale ${w} ${cur}`;
             worldConfig[w] = { name: name, cur: cur, hue: hue };
         }
 
