@@ -236,13 +236,26 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
+        // INTEGRAZIONE PARAMETRI E AUTENTICAZIONE DELL'HUB RIGOROSA
+        const urlParams = new URLSearchParams(window.location.search);
+        let userId = urlParams.get('userId');
+        const playerParam = urlParams.get('player');
+
+        if (!userId || userId === 'guest') {
+            userId = localStorage.getItem('masterhub_logged_user');
+        }
+
+        let userNick = playerParam || localStorage.getItem('nickname') || localStorage.getItem('username') || "Player";
+
         let gridSize = 6;
         let cellSize = 50;
         let blocks = [], initialPos = [], isDragging = false, timerInterval, seconds = 0;
 
         let level = parseInt(localStorage.getItem('mk_level')) || 1;
         let unlockedLevel = parseInt(localStorage.getItem('mk_unlocked')) || 1;
-        let xp = parseInt(localStorage.getItem("points_masterkey")) || 0;
+        let xp = parseInt(localStorage.getItem("points_masterkey")) || parseInt(localStorage.getItem('mk_xp')) || 0;
+        localStorage.setItem('points_masterkey', xp);
+
         let rewardedLevels = JSON.parse(localStorage.getItem('mk_rewarded')) || [];
         let skipCost = parseInt(localStorage.getItem('mk_skip_cost')) || 150;
         let activeTabWorld = 1;
@@ -321,11 +334,64 @@
             requestAnimationFrame(animateParticles);
         }
 
+        // CONTROL OVERRIDE E CARICAMENTO SINCRONIZZATO FIREBASE/LOCALSTORAGE DELL'HUB
         window.onload = () => {
-            loadLevel(level);
-            initParticles();
-            animateParticles();
+            checkUrlLevelOverride();
+            const currentUserId = userId || localStorage.getItem('masterhub_logged_user');
+
+            const bootGame = (targetLevel) => {
+                level = parseInt(targetLevel) || 1;
+                unlockedLevel = Math.max(unlockedLevel, level);
+                localStorage.setItem('mk_level', level);
+                localStorage.setItem('mk_unlocked', unlockedLevel);
+                updateUI();
+                loadLevel(level);
+                initParticles();
+                animateParticles();
+            };
+
+            if (currentUserId && currentUserId !== 'guest' && typeof db !== 'undefined' && db !== null) {
+                db.ref('users/' + currentUserId + '/winsPerGame').once('value').then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const winsData = snapshot.val();
+                        let cloudLevel = null;
+                        
+                        for (let key in winsData) {
+                            let cleanKey = key.toLowerCase().replace(/[\s_-]/g, '');
+                            if (cleanKey.includes('freethekey') || cleanKey.includes('masterkey')) {
+                                cloudLevel = winsData[key];
+                                break;
+                            }
+                        }
+                        
+                        if (cloudLevel !== null && cloudLevel > 1) {
+                            bootGame(cloudLevel);
+                        } else {
+                            bootGame(parseInt(localStorage.getItem('mk_level')) || 1);
+                        }
+                    } else {
+                        bootGame(parseInt(localStorage.getItem('mk_level')) || 1);
+                    }
+                }).catch(() => {
+                    bootGame(parseInt(localStorage.getItem('mk_level')) || 1);
+                });
+            } else {
+                bootGame(parseInt(localStorage.getItem('mk_level')) || 1);
+            }
         };
+
+        function checkUrlLevelOverride() {
+            const paramLevel = urlParams.get('level');
+            if (paramLevel && !isNaN(paramLevel)) {
+                let pLvl = parseInt(paramLevel, 10);
+                level = pLvl;
+                unlockedLevel = Math.max(unlockedLevel, pLvl);
+                localStorage.setItem("mk_level", pLvl);
+                localStorage.setItem("mk_unlocked", unlockedLevel);
+                localStorage.setItem("freeTheKey_level", pLvl);
+                localStorage.setItem("freeTheKey_maxLevelUnlocked", unlockedLevel);
+            }
+        }
 
         function getCurrentWorld(lvl) {
             return Math.min(100, Math.floor((lvl - 1) / 100) + 1);
@@ -363,11 +429,29 @@
             if (fogEl) fogEl.style.display = (worldNum % 10 === 7) ? "block" : "none";
         }
 
+        // FUNZIONI DI SALVATAGGIO FIREBASE E RETE DI TRASMISSIONE CON L'HUB
         async function savePoints(newXp) {
             xp = newXp;
             localStorage.setItem('points_masterkey', xp);
             localStorage.setItem('mk_xp', xp);
             updateUI();
+
+            if (userId && userId !== 'guest' && db) {
+                await db.ref('users/' + userId).update({
+                    xp: xp,
+                    winsPerGame: {
+                        ...((await db.ref('users/' + userId + '/winsPerGame').once('value')).val() || {}),
+                        "Free the Key": level
+                    }
+                });
+            }
+        }
+
+        function triggerGameWin(pointsGained) {
+            const target = window.opener || (window.parent !== window ? window.parent : null);
+            if (target) {
+                target.postMessage({ gameKey: 'master-key', points: pointsGained }, '*');
+            }
         }
 
         function generateLevel(num) {
@@ -480,14 +564,18 @@
             }
 
             setTimeout(() => {
+                let msg = "GIÀ FATTO";
                 let curWorld = getCurrentWorld(level);
                 let currencySymbol = worldConfig[curWorld]?.cur || '💎';
                 const fixedPoints = 100;
 
+                let newXp = xp;
                 if (!rewardedLevels.includes(level)) {
-                    xp += fixedPoints;
+                    newXp += fixedPoints;
                     rewardedLevels.push(level);
                     localStorage.setItem('mk_rewarded', JSON.stringify(rewardedLevels));
+                    triggerGameWin(fixedPoints); // NOTIFICA I PUNTI ALL'HUB
+                    msg = `+${fixedPoints} ${currencySymbol}`;
                 }
 
                 let wasLastLevelOfWorld = (level % 100 === 0);
@@ -496,7 +584,8 @@
                     unlockedLevel++; 
                     localStorage.setItem('mk_unlocked', unlockedLevel); 
                 }
-                savePoints(xp);
+
+                savePoints(newXp);
 
                 const winTitleEl = document.getElementById("win-title");
 
@@ -508,7 +597,7 @@
                 } else if (wasLastLevelOfWorld) {
                     winTitleEl.className = "world-complete-title";
                     winTitleEl.innerText = `MONDO ${curWorld} COMPLETATO 🎉`;
-                    document.getElementById("victory-xp-msg").innerHTML = `Sbloccato il Mondo ${curWorld + 1}!<br>+${fixedPoints} ${currencySymbol} guadagnati!`;
+                    document.getElementById("victory-xp-msg").innerHTML = `Sbloccato il Mondo ${curWorld + 1}!<br>${msg}`;
                     document.getElementById("victory-buttons-container").innerHTML = `
                         <button class="btn-wood" onclick="toggleMenu()">MONDI</button>
                         <button class="btn-wood gold" onclick="nextLevel()">AVANTI</button>
@@ -516,7 +605,7 @@
                 } else {
                     winTitleEl.className = "";
                     winTitleEl.innerText = `Mondo ${curWorld}: Livello completato`;
-                    document.getElementById("victory-xp-msg").innerHTML = `+${fixedPoints} ${currencySymbol} guadagnati!`;
+                    document.getElementById("victory-xp-msg").innerHTML = msg;
                     document.getElementById("victory-buttons-container").innerHTML = `
                         <button class="btn-wood" onclick="toggleMenu()">MONDI</button>
                         <button class="btn-wood gold" onclick="nextLevel()">AVANTI</button>
